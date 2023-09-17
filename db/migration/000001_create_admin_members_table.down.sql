@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS admin;
+DROP TABLE IF EXISTS members;
+DROP TYPE gender;
