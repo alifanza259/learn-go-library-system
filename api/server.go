@@ -2,18 +2,20 @@ package api
 
 import (
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	db     db.Library
-	config util.Config
-	router *gin.Engine
+	db         db.Library
+	config     util.Config
+	router     *gin.Engine
+	tokenMaker token.Maker
 }
 
-func NewServer(db db.Library, config util.Config) (*Server, error) {
-	server := &Server{db: db, config: config}
+func NewServer(db db.Library, config util.Config, tokenMaker token.Maker) (*Server, error) {
+	server := &Server{db: db, config: config, tokenMaker: tokenMaker}
 
 	server.setupRouter()
 
@@ -26,10 +28,13 @@ func (server *Server) setupRouter() {
 	r.GET("/admin/:id", server.getAdmin)
 	r.GET("/admin", server.listAdmin)
 
-	r.GET("/member/:id", server.getMember)
-	r.GET("/members", server.listMembers)
 	r.POST("/members", server.createMember)
 	r.POST("/members/login", server.loginMember)
+
+	authRoutes := r.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes.GET("/member/:id", server.getMember)
+	authRoutes.GET("/members", server.listMembers)
+
 	server.router = r
 }
 

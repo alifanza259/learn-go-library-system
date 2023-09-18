@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -15,7 +16,7 @@ import (
 )
 
 type GetMemberRequest struct {
-	ID string `uri:"id"`
+	ID string `uri:"id" binding:"required,uuid"`
 }
 
 func (server *Server) getMember(c *gin.Context) {
@@ -34,6 +35,12 @@ func (server *Server) getMember(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	if member.Email != accessTokenPayload.Email {
+		c.JSON(http.StatusUnauthorized, errorResponse(errors.New("unauthorized access")))
 		return
 	}
 
@@ -139,7 +146,7 @@ func (server *Server) loginMember(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessExpiresAt, err := token.CreateToken(member)
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
