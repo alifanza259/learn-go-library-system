@@ -29,6 +29,7 @@ func (server *Server) setupRouter() {
 	r.GET("/member/:id", server.getMember)
 	r.GET("/members", server.listMembers)
 	r.POST("/members", server.createMember)
+	r.POST("/members/login", server.loginMember)
 	server.router = r
 }
 

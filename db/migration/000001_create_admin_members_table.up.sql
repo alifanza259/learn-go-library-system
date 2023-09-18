@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE "admin" (
   "id" uuid PRIMARY KEY DEFAULT (uuid_generate_v4()),
-  "email" varchar NOT NULL,
+  "email" varchar NOT NULL UNIQUE,
   "first_name" varchar NOT NULL,
   "last_name" varchar,
   "password" varchar NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE "admin" (
 
 CREATE TABLE "members" (
   "id" uuid PRIMARY KEY DEFAULT (uuid_generate_v4()),
-  "email" varchar NOT NULL,
+  "email" varchar NOT NULL UNIQUE,
   "first_name" varchar NOT NULL,
   "last_name" varchar,
   "dob" date NOT NULL,

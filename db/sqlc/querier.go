@@ -14,8 +14,9 @@ type Querier interface {
 	CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error)
 	GetAdmin(ctx context.Context, id uuid.UUID) (Admin, error)
 	GetMember(ctx context.Context, id uuid.UUID) (Member, error)
+	GetMemberByEmail(ctx context.Context, email string) (Member, error)
 	ListAdmin(ctx context.Context) ([]ListAdminRow, error)
-	ListMembers(ctx context.Context) ([]Member, error)
+	ListMembers(ctx context.Context) ([]ListMembersRow, error)
 }
 
 var _ Querier = (*Queries)(nil)
