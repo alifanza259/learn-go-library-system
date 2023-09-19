@@ -24,4 +24,8 @@ sqlc:
 server:
 	go run main.go;
 
+docker-build: |
+	docker build -t my-golang-app .
+	docker run --name my-golang-process -p 3000:3000 --network library-network my-golang-app
+	
 .PHONY: server sqlc

@@ -14,6 +14,11 @@ Steps:
 4. Run `make migrateup`
 5. Run `make server`
 
+# Run in docker container
+1. Create docker network. Run `docker network create library-network`
+2. Connect postgres container to the network. Run `docker network connect library-network postgres`
+3. Build and run go server connecting to the network. Run `make docker-build`
+
 # Create migration file
 1. Install golang-migrate
 2. Run `migrate create -ext sql -dir db/migration -seq create_users_table`
