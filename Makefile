@@ -27,5 +27,8 @@ server:
 docker-build: |
 	docker build -t my-golang-app .
 	docker run --name my-golang-process -p 3000:3000 --network library-network my-golang-app
-	
+
+gomock:
+	mockgen -destination db/mock/library.go github.com/alifanza259/learn-go-library-system/db/sqlc Library
+
 .PHONY: server sqlc

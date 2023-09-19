@@ -14,7 +14,8 @@ type Server struct {
 	tokenMaker token.Maker
 }
 
-func NewServer(db db.Library, config util.Config, tokenMaker token.Maker) (*Server, error) {
+func NewServer(db db.Library, config util.Config) (*Server, error) {
+	tokenMaker := token.NewJWTMaker(config.SecretKey, config.AccessTokenDuration)
 	server := &Server{db: db, config: config, tokenMaker: tokenMaker}
 
 	server.setupRouter()

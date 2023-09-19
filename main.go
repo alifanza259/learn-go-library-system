@@ -7,8 +7,8 @@ import (
 
 	"github.com/alifanza259/learn-go-library-system/api"
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
-	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
+	_ "github.com/golang/mock/mockgen/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -26,9 +26,8 @@ func main() {
 	defer dbpool.Close()
 
 	q := db.NewLibrary(dbpool)
-	tokenMaker := token.NewJWTMaker(config.SecretKey, config.AccessTokenDuration)
 
-	server, err := api.NewServer(q, config, tokenMaker)
+	server, err := api.NewServer(q, config)
 	if err != nil {
 		log.Fatalf("cannot create server: %s", err)
 	}
