@@ -31,4 +31,7 @@ docker-build: |
 gomock:
 	mockgen -destination db/mock/library.go github.com/alifanza259/learn-go-library-system/db/sqlc Library
 
-.PHONY: server sqlc
+test:
+	go test -v -cover -short ./...;
+
+.PHONY: server sqlc gomock test

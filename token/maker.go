@@ -1,8 +1,13 @@
 package token
 
-import db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+import (
+	"time"
+
+	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+)
 
 type Maker interface {
-	CreateToken(member db.Member) (string, int, error)
+	// duration is passed here as parameter for unit test purposes (test unhappy case)
+	CreateToken(member db.Member, duration time.Duration) (string, int, error)
 	VerifyToken(tokenString string) (*Payload, error)
 }

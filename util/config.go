@@ -1,15 +1,19 @@
 package util
 
-import "github.com/spf13/viper"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 // In order to get the value of the variables and store them in this struct, we need to use the unmarshaling feature of Viper.
 // Viper uses the mapstructure package under the hood for unmarshaling values, so we use the mapstructure tags to specify the name of each config field.
 type Config struct {
-	DBDriver            string `mapstructure:"DB_DRIVER"`
-	DBUrl               string `mapstructure:"DB_URL"`
-	ServerAddress       string `mapstructure:"SERVER_ADDRESS"`
-	SecretKey           string `mapstructure:"SECRET_KEY"`
-	AccessTokenDuration int    `mapstructure:"ACCESS_TOKEN_DURATION"`
+	DBDriver            string        `mapstructure:"DB_DRIVER"`
+	DBUrl               string        `mapstructure:"DB_URL"`
+	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
+	SecretKey           string        `mapstructure:"SECRET_KEY"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

@@ -50,10 +50,6 @@ func (server *Server) getMember(c *gin.Context) {
 func (server *Server) listMembers(c *gin.Context) {
 	member, err := server.db.ListMembers(c)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			c.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
 
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -74,7 +70,7 @@ type CreateMemberRequest struct {
 func (server *Server) createMember(c *gin.Context) {
 	var req CreateMemberRequest
 
-	if err := c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -124,7 +120,7 @@ type LoginMemberResponse struct {
 func (server *Server) loginMember(c *gin.Context) {
 	var req LoginMemberRequest
 
-	if err := c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -146,7 +142,7 @@ func (server *Server) loginMember(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member)
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member, server.config.AccessTokenDuration)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

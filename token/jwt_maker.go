@@ -10,8 +10,7 @@ import (
 )
 
 type JWTMaker struct {
-	secret   string
-	duration int
+	secret string
 }
 
 type Payload struct {
@@ -20,15 +19,14 @@ type Payload struct {
 	jwt.StandardClaims
 }
 
-func NewJWTMaker(secret string, duration int) Maker {
+func NewJWTMaker(secret string) Maker {
 	return &JWTMaker{
-		secret:   secret,
-		duration: duration,
+		secret: secret,
 	}
 }
 
-func (maker *JWTMaker) CreateToken(member db.Member) (string, int, error) {
-	expiresAt := time.Now().Add(time.Second * time.Duration(maker.duration)).Unix()
+func (maker *JWTMaker) CreateToken(member db.Member, duration time.Duration) (string, int, error) {
+	expiresAt := time.Now().Add(duration).Unix()
 	claims := Payload{
 		member.ID.String(),
 		member.Email,
