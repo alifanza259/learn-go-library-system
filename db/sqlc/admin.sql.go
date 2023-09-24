@@ -36,6 +36,29 @@ func (q *Queries) GetAdmin(ctx context.Context, id uuid.UUID) (Admin, error) {
 	return i, err
 }
 
+const getAdminByEmail = `-- name: GetAdminByEmail :one
+SELECT id, email, first_name, last_name, password, permission, last_accessed_at, created_at, updated_at, deleted_at FROM admin
+WHERE email = $1 LIMIT 1
+`
+
+func (q *Queries) GetAdminByEmail(ctx context.Context, email string) (Admin, error) {
+	row := q.db.QueryRow(ctx, getAdminByEmail, email)
+	var i Admin
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FirstName,
+		&i.LastName,
+		&i.Password,
+		&i.Permission,
+		&i.LastAccessedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const listAdmin = `-- name: ListAdmin :many
 SELECT 
     id,

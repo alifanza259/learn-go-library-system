@@ -47,17 +47,6 @@ func (server *Server) getMember(c *gin.Context) {
 	c.JSON(http.StatusOK, member)
 }
 
-func (server *Server) listMembers(c *gin.Context) {
-	member, err := server.db.ListMembers(c)
-	if err != nil {
-
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	c.JSON(http.StatusOK, member)
-}
-
 type CreateMemberRequest struct {
 	Email     string `json:"email" binding:"required,email"`
 	FirstName string `json:"first_name" binding:"required,max=30"`
@@ -112,9 +101,9 @@ type LoginMemberRequest struct {
 }
 
 type LoginMemberResponse struct {
-	Member          db.Member
-	AccessToken     string `json:"access_token"`
-	AccessExpiredAt int    `json:"access_expired_at"`
+	Member          db.Member `json:"member"`
+	AccessToken     string    `json:"access_token"`
+	AccessExpiredAt int       `json:"access_expired_at"`
 }
 
 func (server *Server) loginMember(c *gin.Context) {
@@ -142,7 +131,7 @@ func (server *Server) loginMember(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member, server.config.AccessTokenDuration)
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member.Email, server.config.AccessTokenDuration, "member")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

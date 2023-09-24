@@ -79,6 +79,21 @@ type Admin struct {
 	DeletedAt      pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type Book struct {
+	ID          int32              `json:"id"`
+	Isbn        string             `json:"isbn"`
+	Title       string             `json:"title"`
+	Description pgtype.Text        `json:"description"`
+	Author      string             `json:"author"`
+	ImageUrl    pgtype.Text        `json:"image_url"`
+	Genre       string             `json:"genre"`
+	Quantity    int32              `json:"quantity"`
+	PublishedAt time.Time          `json:"published_at"`
+	CreatedAt   time.Time          `json:"created_at"`
+	UpdatedAt   time.Time          `json:"updated_at"`
+	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
+}
+
 type Member struct {
 	ID                uuid.UUID          `json:"id"`
 	Email             string             `json:"email"`

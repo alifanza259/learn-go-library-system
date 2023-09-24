@@ -1,8 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
+	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx"
@@ -63,4 +66,66 @@ func (server *Server) listAdmin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, admin)
+}
+
+type LoginAdminRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type LoginAdminResponse struct {
+	Admin           db.Admin `json:"admin"`
+	AccessToken     string   `json:"access_token"`
+	AccessExpiredAt int      `json:"access_expired_at"`
+}
+
+func (server *Server) loginAdmin(c *gin.Context) {
+	var req LoginAdminRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	admin, err := server.db.GetAdminByEmail(c, req.Email)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			c.JSON(http.StatusUnauthorized, errorResponse(fmt.Errorf("please check your credentials")))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = util.CheckPassword(req.Password, admin.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, errorResponse(fmt.Errorf("please check your credentials")))
+		return
+	}
+
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(admin.Email, server.config.AccessTokenDuration, "admin")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	resp := LoginAdminResponse{
+		Admin:           admin,
+		AccessToken:     accessToken,
+		AccessExpiredAt: accessExpiresAt,
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (server *Server) listMembers(c *gin.Context) {
+	member, err := server.db.ListMembers(c)
+	if err != nil {
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, member)
 }

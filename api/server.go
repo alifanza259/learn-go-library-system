@@ -15,7 +15,7 @@ type Server struct {
 }
 
 func NewServer(db db.Library, config util.Config) (*Server, error) {
-	tokenMaker := token.NewJWTMaker(config.SecretKey)
+	tokenMaker := token.NewJWTMaker(config.SecretKey, config.SecretKeyAdmin)
 	server := &Server{db: db, config: config, tokenMaker: tokenMaker}
 
 	server.setupRouter()
@@ -26,15 +26,22 @@ func NewServer(db db.Library, config util.Config) (*Server, error) {
 func (server *Server) setupRouter() {
 	r := gin.Default()
 
+	r.GET("/books", server.listBooks)
+	r.GET("/books/:id", server.getBook)
+
 	r.GET("/admin/:id", server.getAdmin)
 	r.GET("/admin", server.listAdmin)
+	r.POST("/admin/login", server.loginAdmin)
 
 	r.POST("/members", server.createMember)
 	r.POST("/members/login", server.loginMember)
 
 	authRoutes := r.Group("/").Use(authMiddleware(server.tokenMaker))
 	authRoutes.GET("/member/:id", server.getMember)
-	authRoutes.GET("/members", server.listMembers)
+
+	adminAuthRoutes := r.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker))
+	adminAuthRoutes.POST("/books", server.createBook)
+	adminAuthRoutes.GET("/members", server.listMembers)
 
 	server.router = r
 }

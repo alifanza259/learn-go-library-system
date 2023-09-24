@@ -11,11 +11,15 @@ import (
 )
 
 type Querier interface {
+	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
 	CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error)
 	GetAdmin(ctx context.Context, id uuid.UUID) (Admin, error)
+	GetAdminByEmail(ctx context.Context, email string) (Admin, error)
+	GetBook(ctx context.Context, id int32) (Book, error)
 	GetMember(ctx context.Context, id uuid.UUID) (Member, error)
 	GetMemberByEmail(ctx context.Context, email string) (Member, error)
 	ListAdmin(ctx context.Context) ([]ListAdminRow, error)
+	ListBooks(ctx context.Context) ([]Book, error)
 	ListMembers(ctx context.Context) ([]ListMembersRow, error)
 }
 

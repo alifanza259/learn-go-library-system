@@ -5,31 +5,30 @@ import (
 	"fmt"
 	"time"
 
-	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/dgrijalva/jwt-go"
 )
 
 type JWTMaker struct {
-	secret string
+	secret      string
+	secretAdmin string
 }
 
 type Payload struct {
-	ID    string `json:"id"`
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func NewJWTMaker(secret string) Maker {
+func NewJWTMaker(secret string, secretAdmin string) Maker {
 	return &JWTMaker{
-		secret: secret,
+		secret:      secret,
+		secretAdmin: secretAdmin,
 	}
 }
 
-func (maker *JWTMaker) CreateToken(member db.Member, duration time.Duration) (string, int, error) {
+func (maker *JWTMaker) CreateToken(email string, duration time.Duration, purpose string) (string, int, error) {
 	expiresAt := time.Now().Add(duration).Unix()
 	claims := Payload{
-		member.ID.String(),
-		member.Email,
+		email,
 		jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: expiresAt,
@@ -38,7 +37,15 @@ func (maker *JWTMaker) CreateToken(member db.Member, duration time.Duration) (st
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
-	tokenString, err := token.SignedString([]byte(maker.secret))
+
+	var secret string
+	if purpose == "admin" {
+		secret = maker.secretAdmin
+	} else {
+		secret = maker.secret
+	}
+
+	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to create token: %w", err)
 	}
@@ -46,14 +53,21 @@ func (maker *JWTMaker) CreateToken(member db.Member, duration time.Duration) (st
 	return tokenString, int(expiresAt), nil
 }
 
-func (maker *JWTMaker) VerifyToken(tokenString string) (*Payload, error) {
+func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload, error) {
+	var secret string
+	if purpose == "admin" {
+		secret = maker.secretAdmin
+	} else {
+		secret = maker.secret
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &Payload{}, func(t *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("token is invalid")
 		}
 
-		return []byte(maker.secret), nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {

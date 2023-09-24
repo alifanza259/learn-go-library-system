@@ -13,6 +13,7 @@ type Config struct {
 	DBUrl               string        `mapstructure:"DB_URL"`
 	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
 	SecretKey           string        `mapstructure:"SECRET_KEY"`
+	SecretKeyAdmin      string        `mapstructure:"SECRET_KEY_ADMIN"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
