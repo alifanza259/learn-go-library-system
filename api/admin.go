@@ -74,9 +74,27 @@ type LoginAdminRequest struct {
 }
 
 type LoginAdminResponse struct {
-	Admin           db.Admin `json:"admin"`
-	AccessToken     string   `json:"access_token"`
-	AccessExpiredAt int      `json:"access_expired_at"`
+	Admin           adminResponse `json:"admin"`
+	AccessToken     string        `json:"access_token"`
+	AccessExpiredAt int           `json:"access_expired_at"`
+}
+
+type adminResponse struct {
+	ID        uuid.UUID
+	Email     string
+	FirstName string
+	LastName  pgtype.Text
+	CreatedAt int64
+}
+
+func newAdminResponse(admin db.Admin) adminResponse {
+	return adminResponse{
+		ID:        admin.ID,
+		Email:     admin.Email,
+		FirstName: admin.FirstName,
+		LastName:  admin.LastName,
+		CreatedAt: admin.CreatedAt.Unix(),
+	}
 }
 
 func (server *Server) loginAdmin(c *gin.Context) {
@@ -111,7 +129,7 @@ func (server *Server) loginAdmin(c *gin.Context) {
 	}
 
 	resp := LoginAdminResponse{
-		Admin:           admin,
+		Admin:           newAdminResponse(admin),
 		AccessToken:     accessToken,
 		AccessExpiredAt: accessExpiresAt,
 	}

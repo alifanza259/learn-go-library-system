@@ -1,11 +1,14 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+	external "github.com/alifanza259/learn-go-library-system/external/aws"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -46,24 +49,38 @@ func (server *Server) getBook(c *gin.Context) {
 }
 
 type createBookRequest struct {
-	Isbn        string    `json:"isbn" binding:"required"`
-	Title       string    `json:"title" binding:"required"`
-	Description string    `json:"description" binding:"required"`
-	Author      string    `json:"author" binding:"required"`
-	ImageUrl    string    `json:"image_url" binding:"required"`
-	Genre       string    `json:"genre" binding:"required"`
-	Quantity    int       `json:"quantity" binding:"required"`
-	PublishedAt time.Time `json:"published_at" binding:"required"`
+	Isbn        string `form:"isbn" binding:"required"`
+	Title       string `form:"title" binding:"required"`
+	Description string `form:"description" binding:"required"`
+	Author      string `form:"author" binding:"required"`
+	Genre       string `form:"genre" binding:"required"`
+	Quantity    int    `form:"quantity" binding:"required"`
+	PublishedAt int64  `form:"published_at" binding:"required"`
 }
 
 func (server *Server) createBook(c *gin.Context) {
 	var req createBookRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	// TODO: Add upload to s3
+	file, err := c.FormFile("image")
+	if err != nil {
+		if err == http.ErrMissingFile {
+			c.JSON(http.StatusBadRequest, errorResponse(errors.New("image is not provided")))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	location, err := external.UploadToS3(server.config, file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
 	arg := db.CreateBookParams{
 		Isbn:  req.Isbn,
@@ -74,12 +91,12 @@ func (server *Server) createBook(c *gin.Context) {
 		},
 		Author: req.Author,
 		ImageUrl: pgtype.Text{
-			String: req.ImageUrl,
-			Valid:  req.ImageUrl != "",
+			String: location,
+			Valid:  true,
 		},
 		Genre:       req.Genre,
 		Quantity:    int32(req.Quantity),
-		PublishedAt: req.PublishedAt,
+		PublishedAt: time.Unix(req.PublishedAt, 0),
 	}
 
 	book, err := server.db.CreateBook(c, arg)

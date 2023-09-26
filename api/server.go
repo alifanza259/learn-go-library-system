@@ -25,6 +25,7 @@ func NewServer(db db.Library, config util.Config) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	r := gin.Default()
+	r.MaxMultipartMemory = server.config.MaxFileSize << 20
 
 	r.GET("/books", server.listBooks)
 	r.GET("/books/:id", server.getBook)

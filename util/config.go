@@ -15,6 +15,10 @@ type Config struct {
 	SecretKey           string        `mapstructure:"SECRET_KEY"`
 	SecretKeyAdmin      string        `mapstructure:"SECRET_KEY_ADMIN"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	MaxFileSize         int64         `mapstructure:"MAX_FILE_SIZE"`
+	AwsRegion           string        `mapstructure:"AWS_REGION"`
+	AwsAccessKeyId      string        `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AwsSecretAccessKey  string        `mapstructure:"AWS_SECRET_ACCESS_KEY"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
