@@ -15,6 +15,8 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 COPY app.env .
+COPY wait-for.sh .
+COPY start.sh .
 
 EXPOSE 3000
 CMD [ "/app/main" ]
