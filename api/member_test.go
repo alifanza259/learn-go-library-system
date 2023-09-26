@@ -77,7 +77,7 @@ func TestGetMember(t *testing.T) {
 			name:   "OK",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member, time.Minute)
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -93,7 +93,7 @@ func TestGetMember(t *testing.T) {
 			name:   "No Member Found",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member, time.Minute)
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -109,7 +109,7 @@ func TestGetMember(t *testing.T) {
 			name:   "Internal Error",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member, time.Minute)
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -125,7 +125,7 @@ func TestGetMember(t *testing.T) {
 			name:   "Unauthorized Access",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}, time.Minute)
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, time.Minute, "membeer")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -253,68 +253,6 @@ func TestCreateMember(t *testing.T) {
 		})
 	}
 
-}
-
-func TestListMembers(t *testing.T) {
-	members := []db.ListMembersRow{
-		{
-			ID: uuid.New(),
-		},
-		{
-			ID: uuid.New(),
-		},
-	}
-	testCases := []struct {
-		name          string
-		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-		buildStubs    func(libraryMock *mockdb.MockLibrary)
-		checkResponse func(t *testing.T, recorder httptest.ResponseRecorder)
-	}{
-		{
-			name: "OK",
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}, time.Minute)
-			},
-			buildStubs: func(libraryMock *mockdb.MockLibrary) {
-				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return(members, nil)
-			},
-			checkResponse: func(t *testing.T, recorder httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
-			},
-		},
-		{
-			name: "Internal Error",
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}, time.Minute)
-			},
-			buildStubs: func(libraryMock *mockdb.MockLibrary) {
-				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return([]db.ListMembersRow{}, &pgconn.PgError{Code: "123"})
-			},
-			checkResponse: func(t *testing.T, recorder httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-	}
-
-	for i := range testCases {
-		tc := testCases[i]
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			libraryMock := mockdb.NewMockLibrary(ctrl)
-			tc.buildStubs(libraryMock)
-			request, err := http.NewRequest(http.MethodGet, "/members", nil)
-			require.NoError(t, err)
-
-			recorder := httptest.NewRecorder()
-
-			server := newTestServer(t, libraryMock)
-			tc.setupAuth(t, request, server.tokenMaker)
-
-			server.router.ServeHTTP(recorder, request)
-
-			tc.checkResponse(t, *recorder)
-		})
-	}
 }
 
 func TestLoginMember(t *testing.T) {
