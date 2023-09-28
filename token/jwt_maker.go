@@ -15,6 +15,7 @@ type JWTMaker struct {
 
 type Payload struct {
 	Email string `json:"email"`
+	ID    string `json:"id"`
 	jwt.StandardClaims
 }
 
@@ -25,10 +26,11 @@ func NewJWTMaker(secret string, secretAdmin string) Maker {
 	}
 }
 
-func (maker *JWTMaker) CreateToken(email string, duration time.Duration, purpose string) (string, int, error) {
+func (maker *JWTMaker) CreateToken(email string, id string, duration time.Duration, purpose string) (string, int, error) {
 	expiresAt := time.Now().Add(duration).Unix()
 	claims := Payload{
 		email,
+		id,
 		jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: expiresAt,

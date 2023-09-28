@@ -131,7 +131,7 @@ func (server *Server) loginMember(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member.Email, server.config.AccessTokenDuration, "member")
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(member.Email, member.ID.String(), server.config.AccessTokenDuration, "member")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

@@ -122,7 +122,7 @@ func (server *Server) loginAdmin(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(admin.Email, server.config.AccessTokenDuration, "admin")
+	accessToken, accessExpiresAt, err := server.tokenMaker.CreateToken(admin.Email, admin.ID.String(), server.config.AccessTokenDuration, "admin")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -135,15 +135,4 @@ func (server *Server) loginAdmin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
-}
-
-func (server *Server) listMembers(c *gin.Context) {
-	member, err := server.db.ListMembers(c)
-	if err != nil {
-
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	c.JSON(http.StatusOK, member)
 }

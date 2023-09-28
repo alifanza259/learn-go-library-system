@@ -51,6 +51,21 @@ func (mr *MockLibraryMockRecorder) CreateBook(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBook", reflect.TypeOf((*MockLibrary)(nil).CreateBook), arg0, arg1)
 }
 
+// CreateBorrow mocks base method.
+func (m *MockLibrary) CreateBorrow(arg0 context.Context, arg1 db.CreateBorrowParams) (db.BorrowDetail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateBorrow", arg0, arg1)
+	ret0, _ := ret[0].(db.BorrowDetail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateBorrow indicates an expected call of CreateBorrow.
+func (mr *MockLibraryMockRecorder) CreateBorrow(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBorrow", reflect.TypeOf((*MockLibrary)(nil).CreateBorrow), arg0, arg1)
+}
+
 // CreateMember mocks base method.
 func (m *MockLibrary) CreateMember(arg0 context.Context, arg1 db.CreateMemberParams) (db.Member, error) {
 	m.ctrl.T.Helper()
@@ -64,6 +79,35 @@ func (m *MockLibrary) CreateMember(arg0 context.Context, arg1 db.CreateMemberPar
 func (mr *MockLibraryMockRecorder) CreateMember(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockLibrary)(nil).CreateMember), arg0, arg1)
+}
+
+// CreateTransaction mocks base method.
+func (m *MockLibrary) CreateTransaction(arg0 context.Context, arg1 db.CreateTransactionParams) (db.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTransaction", arg0, arg1)
+	ret0, _ := ret[0].(db.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateTransaction indicates an expected call of CreateTransaction.
+func (mr *MockLibraryMockRecorder) CreateTransaction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTransaction", reflect.TypeOf((*MockLibrary)(nil).CreateTransaction), arg0, arg1)
+}
+
+// DeleteBook mocks base method.
+func (m *MockLibrary) DeleteBook(arg0 context.Context, arg1 int32) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBook", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteBook indicates an expected call of DeleteBook.
+func (mr *MockLibraryMockRecorder) DeleteBook(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBook", reflect.TypeOf((*MockLibrary)(nil).DeleteBook), arg0, arg1)
 }
 
 // GetAdmin mocks base method.
@@ -111,6 +155,21 @@ func (mr *MockLibraryMockRecorder) GetBook(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBook", reflect.TypeOf((*MockLibrary)(nil).GetBook), arg0, arg1)
 }
 
+// GetBorrow mocks base method.
+func (m *MockLibrary) GetBorrow(arg0 context.Context, arg1 uuid.UUID) (db.BorrowDetail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBorrow", arg0, arg1)
+	ret0, _ := ret[0].(db.BorrowDetail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBorrow indicates an expected call of GetBorrow.
+func (mr *MockLibraryMockRecorder) GetBorrow(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBorrow", reflect.TypeOf((*MockLibrary)(nil).GetBorrow), arg0, arg1)
+}
+
 // GetMember mocks base method.
 func (m *MockLibrary) GetMember(arg0 context.Context, arg1 uuid.UUID) (db.Member, error) {
 	m.ctrl.T.Helper()
@@ -139,6 +198,36 @@ func (m *MockLibrary) GetMemberByEmail(arg0 context.Context, arg1 string) (db.Me
 func (mr *MockLibraryMockRecorder) GetMemberByEmail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMemberByEmail", reflect.TypeOf((*MockLibrary)(nil).GetMemberByEmail), arg0, arg1)
+}
+
+// GetTransaction mocks base method.
+func (m *MockLibrary) GetTransaction(arg0 context.Context, arg1 uuid.UUID) (db.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransaction", arg0, arg1)
+	ret0, _ := ret[0].(db.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransaction indicates an expected call of GetTransaction.
+func (mr *MockLibraryMockRecorder) GetTransaction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransaction", reflect.TypeOf((*MockLibrary)(nil).GetTransaction), arg0, arg1)
+}
+
+// GetTransactionAndBorrowDetail mocks base method.
+func (m *MockLibrary) GetTransactionAndBorrowDetail(arg0 context.Context, arg1 uuid.UUID) (db.GetTransactionAndBorrowDetailRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionAndBorrowDetail", arg0, arg1)
+	ret0, _ := ret[0].(db.GetTransactionAndBorrowDetailRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionAndBorrowDetail indicates an expected call of GetTransactionAndBorrowDetail.
+func (mr *MockLibraryMockRecorder) GetTransactionAndBorrowDetail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionAndBorrowDetail", reflect.TypeOf((*MockLibrary)(nil).GetTransactionAndBorrowDetail), arg0, arg1)
 }
 
 // ListAdmin mocks base method.
@@ -184,4 +273,34 @@ func (m *MockLibrary) ListMembers(arg0 context.Context) ([]db.ListMembersRow, er
 func (mr *MockLibraryMockRecorder) ListMembers(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMembers", reflect.TypeOf((*MockLibrary)(nil).ListMembers), arg0)
+}
+
+// UpdateBook mocks base method.
+func (m *MockLibrary) UpdateBook(arg0 context.Context, arg1 db.UpdateBookParams) (db.Book, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBook", arg0, arg1)
+	ret0, _ := ret[0].(db.Book)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateBook indicates an expected call of UpdateBook.
+func (mr *MockLibraryMockRecorder) UpdateBook(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBook", reflect.TypeOf((*MockLibrary)(nil).UpdateBook), arg0, arg1)
+}
+
+// UpdateTransaction mocks base method.
+func (m *MockLibrary) UpdateTransaction(arg0 context.Context, arg1 db.UpdateTransactionParams) (db.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTransaction", arg0, arg1)
+	ret0, _ := ret[0].(db.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateTransaction indicates an expected call of UpdateTransaction.
+func (mr *MockLibraryMockRecorder) UpdateTransaction(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTransaction", reflect.TypeOf((*MockLibrary)(nil).UpdateTransaction), arg0, arg1)
 }

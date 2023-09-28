@@ -12,15 +12,23 @@ import (
 
 type Querier interface {
 	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
+	CreateBorrow(ctx context.Context, arg CreateBorrowParams) (BorrowDetail, error)
 	CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error)
+	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
+	DeleteBook(ctx context.Context, id int32) error
 	GetAdmin(ctx context.Context, id uuid.UUID) (Admin, error)
 	GetAdminByEmail(ctx context.Context, email string) (Admin, error)
 	GetBook(ctx context.Context, id int32) (Book, error)
+	GetBorrow(ctx context.Context, id uuid.UUID) (BorrowDetail, error)
 	GetMember(ctx context.Context, id uuid.UUID) (Member, error)
 	GetMemberByEmail(ctx context.Context, email string) (Member, error)
+	GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error)
+	GetTransactionAndBorrowDetail(ctx context.Context, id uuid.UUID) (GetTransactionAndBorrowDetailRow, error)
 	ListAdmin(ctx context.Context) ([]ListAdminRow, error)
 	ListBooks(ctx context.Context) ([]Book, error)
 	ListMembers(ctx context.Context) ([]ListMembersRow, error)
+	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
+	UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error)
 }
 
 var _ Querier = (*Queries)(nil)

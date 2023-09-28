@@ -68,6 +68,16 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 	return i, err
 }
 
+const deleteBook = `-- name: DeleteBook :exec
+DELETE FROM books
+WHERE id=$1
+`
+
+func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteBook, id)
+	return err
+}
+
 const getBook = `-- name: GetBook :one
 SELECT id, isbn, title, description, author, image_url, genre, quantity, published_at, created_at, updated_at, deleted_at FROM books
 WHERE id = $1 LIMIT 1
@@ -130,4 +140,61 @@ func (q *Queries) ListBooks(ctx context.Context) ([]Book, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateBook = `-- name: UpdateBook :one
+UPDATE books 
+SET 
+  isbn=coalesce($1, isbn),
+  title=coalesce($2, title),
+  description=coalesce($3, description),
+  author=coalesce($4, author),
+  image_url=coalesce($5, image_url),
+  genre=coalesce($6, genre),
+  quantity=coalesce($7, quantity),
+  published_at=coalesce($8, published_at)
+WHERE id=$9
+RETURNING id, isbn, title, description, author, image_url, genre, quantity, published_at, created_at, updated_at, deleted_at
+`
+
+type UpdateBookParams struct {
+	Isbn        pgtype.Text        `json:"isbn"`
+	Title       pgtype.Text        `json:"title"`
+	Description pgtype.Text        `json:"description"`
+	Author      pgtype.Text        `json:"author"`
+	ImageUrl    pgtype.Text        `json:"image_url"`
+	Genre       pgtype.Text        `json:"genre"`
+	Quantity    pgtype.Int4        `json:"quantity"`
+	PublishedAt pgtype.Timestamptz `json:"published_at"`
+	ID          int32              `json:"id"`
+}
+
+func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
+	row := q.db.QueryRow(ctx, updateBook,
+		arg.Isbn,
+		arg.Title,
+		arg.Description,
+		arg.Author,
+		arg.ImageUrl,
+		arg.Genre,
+		arg.Quantity,
+		arg.PublishedAt,
+		arg.ID,
+	)
+	var i Book
+	err := row.Scan(
+		&i.ID,
+		&i.Isbn,
+		&i.Title,
+		&i.Description,
+		&i.Author,
+		&i.ImageUrl,
+		&i.Genre,
+		&i.Quantity,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }

@@ -33,7 +33,7 @@ func TestListMembers(t *testing.T) {
 		{
 			name: "OK",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, time.Minute, "member")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return(members, nil)
@@ -45,7 +45,7 @@ func TestListMembers(t *testing.T) {
 		{
 			name: "Internal Error",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, time.Minute, "member")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return([]db.ListMembersRow{}, &pgconn.PgError{Code: "123"})

@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS borrow_details CASCADE;
+
+DROP TYPE purpose;
+DROP TYPE status;

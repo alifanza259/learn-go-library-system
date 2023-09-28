@@ -20,10 +20,11 @@ func addAuthorization(
 	tokenMaker token.Maker,
 	authorizationType string,
 	email string,
+	id uuid.UUID,
 	duration time.Duration,
 	purpose string,
 ) {
-	token, payload, err := tokenMaker.CreateToken(email, duration, purpose)
+	token, payload, err := tokenMaker.CreateToken(email, id.String(), duration, purpose)
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 
@@ -56,7 +57,7 @@ func TestAuthMiddleware(t *testing.T) {
 		FirstName: "Alif",
 	}
 	func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-		addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
+		addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, member.ID, time.Minute, "member")
 	}(t, request, server.tokenMaker)
 
 	server.router.ServeHTTP(recorder, request)
@@ -89,7 +90,7 @@ func TestAdminAuthMiddleware(t *testing.T) {
 		FirstName: "Admin",
 	}
 	func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-		addAuthorization(t, request, tokenMaker, authorizationTypeBearer, admin.Email, time.Minute, "admin")
+		addAuthorization(t, request, tokenMaker, authorizationTypeBearer, admin.Email, admin.ID, time.Minute, "admin")
 	}(t, request, server.tokenMaker)
 
 	server.router.ServeHTTP(recorder, request)

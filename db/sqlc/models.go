@@ -66,6 +66,110 @@ func (e Gender) Valid() bool {
 	return false
 }
 
+type Purpose string
+
+const (
+	PurposeBorrow Purpose = "borrow"
+	PurposeReturn Purpose = "return"
+)
+
+func (e *Purpose) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Purpose(s)
+	case string:
+		*e = Purpose(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Purpose: %T", src)
+	}
+	return nil
+}
+
+type NullPurpose struct {
+	Purpose Purpose `json:"purpose"`
+	Valid   bool    `json:"valid"` // Valid is true if Purpose is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPurpose) Scan(value interface{}) error {
+	if value == nil {
+		ns.Purpose, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Purpose.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPurpose) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Purpose), nil
+}
+
+func (e Purpose) Valid() bool {
+	switch e {
+	case PurposeBorrow,
+		PurposeReturn:
+		return true
+	}
+	return false
+}
+
+type Status string
+
+const (
+	StatusPending  Status = "pending"
+	StatusDeclined Status = "declined"
+	StatusApproved Status = "approved"
+)
+
+func (e *Status) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Status(s)
+	case string:
+		*e = Status(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Status: %T", src)
+	}
+	return nil
+}
+
+type NullStatus struct {
+	Status Status `json:"status"`
+	Valid  bool   `json:"valid"` // Valid is true if Status is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.Status, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Status.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Status), nil
+}
+
+func (e Status) Valid() bool {
+	switch e {
+	case StatusPending,
+		StatusDeclined,
+		StatusApproved:
+		return true
+	}
+	return false
+}
+
 type Admin struct {
 	ID             uuid.UUID          `json:"id"`
 	Email          string             `json:"email"`
@@ -94,6 +198,16 @@ type Book struct {
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type BorrowDetail struct {
+	ID         uuid.UUID          `json:"id"`
+	BookID     int32              `json:"book_id"`
+	BorrowedAt time.Time          `json:"borrowed_at"`
+	ReturnedAt time.Time          `json:"returned_at"`
+	CreatedAt  time.Time          `json:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at"`
+	DeletedAt  pgtype.Timestamptz `json:"deleted_at"`
+}
+
 type Member struct {
 	ID                uuid.UUID          `json:"id"`
 	Email             string             `json:"email"`
@@ -107,4 +221,17 @@ type Member struct {
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
 	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+}
+
+type Transaction struct {
+	ID        uuid.UUID          `json:"id"`
+	MemberID  uuid.UUID          `json:"member_id"`
+	AdminID   pgtype.UUID        `json:"admin_id"`
+	BorrowID  uuid.UUID          `json:"borrow_id"`
+	Purpose   Purpose            `json:"purpose"`
+	Status    Status             `json:"status"`
+	Note      pgtype.Text        `json:"note"`
+	CreatedAt time.Time          `json:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at"`
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
 }

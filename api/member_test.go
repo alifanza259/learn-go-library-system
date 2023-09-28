@@ -77,7 +77,7 @@ func TestGetMember(t *testing.T) {
 			name:   "OK",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, member.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -93,7 +93,7 @@ func TestGetMember(t *testing.T) {
 			name:   "No Member Found",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, member.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -109,7 +109,7 @@ func TestGetMember(t *testing.T) {
 			name:   "Internal Error",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, time.Minute, "member")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, member.Email, member.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -125,7 +125,7 @@ func TestGetMember(t *testing.T) {
 			name:   "Unauthorized Access",
 			member: member,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, time.Minute, "membeer")
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.ID, time.Minute, "membeer")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
 				libraryMock.EXPECT().
@@ -149,7 +149,7 @@ func TestGetMember(t *testing.T) {
 			server := newTestServer(t, libraryMock)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/member/%s", tc.member.ID)
+			url := fmt.Sprintf("/v1/member/%s", tc.member.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -239,7 +239,7 @@ func TestCreateMember(t *testing.T) {
 			server := newTestServer(t, libraryMock)
 			recorder := httptest.NewRecorder()
 
-			url := "/members"
+			url := "/v1/members"
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
@@ -332,7 +332,7 @@ func TestLoginMember(t *testing.T) {
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			request, err := http.NewRequest(http.MethodPost, "/members/login", bytes.NewBuffer(data))
+			request, err := http.NewRequest(http.MethodPost, "/v1/members/login", bytes.NewBuffer(data))
 			require.NoError(t, err)
 
 			server := newTestServer(t, libraryMock)
