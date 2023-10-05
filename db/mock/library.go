@@ -36,6 +36,21 @@ func (m *MockLibrary) EXPECT() *MockLibraryMockRecorder {
 	return m.recorder
 }
 
+// BorrowTx mocks base method.
+func (m *MockLibrary) BorrowTx(arg0 context.Context, arg1 db.BorrowTxParams) (db.BorrowTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BorrowTx", arg0, arg1)
+	ret0, _ := ret[0].(db.BorrowTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BorrowTx indicates an expected call of BorrowTx.
+func (mr *MockLibraryMockRecorder) BorrowTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BorrowTx", reflect.TypeOf((*MockLibrary)(nil).BorrowTx), arg0, arg1)
+}
+
 // CreateBook mocks base method.
 func (m *MockLibrary) CreateBook(arg0 context.Context, arg1 db.CreateBookParams) (db.Book, error) {
 	m.ctrl.T.Helper()

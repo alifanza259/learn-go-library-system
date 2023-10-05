@@ -78,29 +78,24 @@ func (server *Server) borrowBooks(c *gin.Context) {
 		return
 	}
 
-	// TODO: Create db transaction
-	// Create entry in borrow_details table
+	// Create entry in borrow_details and transactions table using sql transaction
+	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
 	borrowDetailArg := db.CreateBorrowParams{
 		BookID:     req.ID,
 		BorrowedAt: time.Unix(int64(req.BorrowDate), 0),
 		ReturnedAt: time.Unix(int64(req.ReturnDate), 0),
 	}
-	borrowDetail, err := server.db.CreateBorrow(c, borrowDetailArg)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	// Create entry in transactions table
-	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
-
-	arg := db.CreateTransactionParams{
+	createTransactionArg := db.CreateTransactionParams{
 		MemberID: uuid.MustParse(accessTokenPayload.ID),
 		Purpose:  "borrow",
 		Status:   db.StatusPending,
-		BorrowID: borrowDetail.ID,
+		BorrowID: uuid.Nil,
 	}
-	transaction, err := server.db.CreateTransaction(c, arg)
+
+	transaction, err := server.db.BorrowTx(c, db.BorrowTxParams{
+		CreateBorrowParams:      borrowDetailArg,
+		CreateTransactionParams: createTransactionArg,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

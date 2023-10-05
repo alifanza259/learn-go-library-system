@@ -1,11 +1,14 @@
 package db
 
 import (
+	"context"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Library interface {
 	Querier
+	BorrowTx(ctx context.Context, arg BorrowTxParams) (BorrowTxResult, error)
 }
 
 // Provide all functions for db queries (Queries) and transactions (db)

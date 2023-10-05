@@ -19,6 +19,7 @@ func newTestServer(t *testing.T, library db.Library) *Server {
 	return server
 }
 
+// According to docs, TestMain will be invoked before running the main test. property m can be accessed in the test
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
