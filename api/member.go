@@ -64,7 +64,12 @@ func (server *Server) createMember(c *gin.Context) {
 		return
 	}
 
-	// TODO: Add validator for request fields
+	violation := validateCreateMemberRequest(req)
+	if violation != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(violation))
+		return
+	}
+
 	hashedPassword, err := util.HashPassword(req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -93,6 +98,14 @@ func (server *Server) createMember(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, member)
+}
+
+func validateCreateMemberRequest(req CreateMemberRequest) error {
+	if req.Dob > int(time.Now().UnixMilli()) {
+		return errors.New("date of birth cannot be in the future")
+	}
+	// And more
+	return nil
 }
 
 type LoginMemberRequest struct {

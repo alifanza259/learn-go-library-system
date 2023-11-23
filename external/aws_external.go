@@ -3,20 +3,31 @@ package external
 import (
 	"mime/multipart"
 
-	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-const AwsRegion = "ap-southeast-1"
+type AwsExternal struct {
+	awsSecretAccessKey string
+	awsAccessKeyId     string
+	awsRegion          string
+}
 
-func UploadToS3(config util.Config, file *multipart.FileHeader) (string, error) {
+func NewAwsExternal(awsSecretAccessKey, awsAccessKeyId, awsRegion string) External {
+	return &AwsExternal{
+		awsSecretAccessKey: awsSecretAccessKey,
+		awsAccessKeyId:     awsAccessKeyId,
+		awsRegion:          awsRegion,
+	}
+}
+
+func (awsExternal AwsExternal) UploadAttachment(file *multipart.FileHeader) (string, error) {
 	// By default getting credentials value from ~/.aws/credentials. This line is for getting credentials from variable
-	credentials := credentials.NewStaticCredentials(config.AwsAccessKeyId, config.AwsSecretAccessKey, "")
+	credentials := credentials.NewStaticCredentials(awsExternal.awsAccessKeyId, awsExternal.awsSecretAccessKey, "")
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region:      aws.String(AwsRegion),
+		Region:      aws.String(awsExternal.awsRegion),
 		Credentials: credentials,
 	}))
 	fileContent, err := file.Open()

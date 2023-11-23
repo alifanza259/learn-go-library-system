@@ -2,6 +2,7 @@ package api
 
 import (
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+	"github.com/alifanza259/learn-go-library-system/external"
 	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/gin-gonic/gin"
@@ -12,11 +13,14 @@ type Server struct {
 	config     util.Config
 	router     *gin.Engine
 	tokenMaker token.Maker
+	external   external.External
 }
 
 func NewServer(db db.Library, config util.Config) (*Server, error) {
 	tokenMaker := token.NewJWTMaker(config.SecretKey, config.SecretKeyAdmin)
-	server := &Server{db: db, config: config, tokenMaker: tokenMaker}
+	external := external.NewAwsExternal(config.AwsSecretAccessKey, config.AwsAccessKeyId, config.AwsRegion)
+
+	server := &Server{db: db, config: config, tokenMaker: tokenMaker, external: external}
 
 	server.setupRouter()
 
@@ -49,7 +53,7 @@ func (server *Server) setupRouter() {
 	adminAuthRoutes.POST("/books", server.createBook)
 	adminAuthRoutes.PATCH("/book/:id", server.updateBook)
 	adminAuthRoutes.DELETE("/book/:id", server.deleteBook)
-	adminAuthRoutes.PATCH("/books/process_request", server.processRequest)
+	adminAuthRoutes.PATCH("/books/process_request", server.processBorrowReq)
 
 	server.router = r
 }

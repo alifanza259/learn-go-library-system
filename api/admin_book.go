@@ -6,7 +6,6 @@ import (
 	"time"
 
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
-	external "github.com/alifanza259/learn-go-library-system/external/aws"
 	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -43,7 +42,7 @@ func (server *Server) createBook(c *gin.Context) {
 		return
 	}
 
-	location, err := external.UploadToS3(server.config, file)
+	location, err := server.external.UploadAttachment(file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -126,7 +125,7 @@ func (server *Server) updateBook(c *gin.Context) {
 
 	var location string
 	if file != nil {
-		location, err = external.UploadToS3(server.config, file)
+		location, err = server.external.UploadAttachment(file)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -208,14 +207,14 @@ func (server *Server) deleteBook(c *gin.Context) {
 	c.JSON(http.StatusNoContent, "")
 }
 
-type ProcessRequestRequest struct {
+type ProcessBorrowReqRequest struct {
 	ID     uuid.UUID `json:"transaction_id" binding:"required"`
 	Status string    `json:"status" binding:"required"`
 	Note   string    `json:"note"`
 }
 
-func (server *Server) processRequest(c *gin.Context) {
-	var req ProcessRequestRequest
+func (server *Server) processBorrowReq(c *gin.Context) {
+	var req ProcessBorrowReqRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
 		return

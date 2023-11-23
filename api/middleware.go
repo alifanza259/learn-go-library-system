@@ -16,7 +16,7 @@ const (
 	authorizationPayloadKey = "authorization_payload"
 )
 
-func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
+func handler(tokenMaker token.Maker, purpose string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorizationHeader := ctx.GetHeader("Authorization")
 		if len(authorizationHeader) == 0 {
@@ -40,7 +40,7 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		}
 
 		accessToken := fields[1]
-		payload, err := tokenMaker.VerifyToken(accessToken, "member")
+		payload, err := tokenMaker.VerifyToken(accessToken, purpose)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
 			return
@@ -50,38 +50,10 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
+	return handler(tokenMaker, "member")
+}
 
 func adminAuthMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.GetHeader("Authorization")
-		if len(authorizationHeader) == 0 {
-			err := errors.New("authorization header is not provided")
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
-			return
-		}
-
-		fields := strings.Split(authorizationHeader, " ")
-		if len(fields) < 2 {
-			err := errors.New("invalid authorization header format")
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
-			return
-		}
-
-		authorizationType := strings.ToLower(fields[0])
-		if authorizationType != authorizationTypeBearer {
-			err := fmt.Errorf("unsupported authorization type %s", authorizationType)
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
-			return
-		}
-
-		accessToken := fields[1]
-		payload, err := tokenMaker.VerifyToken(accessToken, "admin")
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
-			return
-		}
-
-		ctx.Set(authorizationPayloadKey, payload)
-		ctx.Next()
-	}
+	return handler(tokenMaker, "admin")
 }
