@@ -96,6 +96,21 @@ func (mr *MockLibraryMockRecorder) CreateMember(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockLibrary)(nil).CreateMember), arg0, arg1)
 }
 
+// CreateMemberTx mocks base method.
+func (m *MockLibrary) CreateMemberTx(arg0 context.Context, arg1 db.CreateMemberTxParams) (db.CreateMemberTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMemberTx", arg0, arg1)
+	ret0, _ := ret[0].(db.CreateMemberTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMemberTx indicates an expected call of CreateMemberTx.
+func (mr *MockLibraryMockRecorder) CreateMemberTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMemberTx", reflect.TypeOf((*MockLibrary)(nil).CreateMemberTx), arg0, arg1)
+}
+
 // CreateTransaction mocks base method.
 func (m *MockLibrary) CreateTransaction(arg0 context.Context, arg1 db.CreateTransactionParams) (db.Transaction, error) {
 	m.ctrl.T.Helper()

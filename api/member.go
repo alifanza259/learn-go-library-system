@@ -9,6 +9,7 @@ import (
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
+	"github.com/alifanza259/learn-go-library-system/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -91,7 +92,15 @@ func (server *Server) createMember(c *gin.Context) {
 		Password: string(hashedPassword),
 	}
 
-	member, err := server.db.CreateMember(c, arg)
+	member, err := server.db.CreateMemberTx(c, db.CreateMemberTxParams{
+		CreateMemberParams: arg,
+		AfterCreate: func(member db.Member) error {
+			return server.taskDistributor.DistributeTaskSendVerifyEmail(c, &worker.PayloadSendVerifyEmail{
+				Username: member.FirstName,
+				UUID:     member.ID.String(),
+			})
+		},
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

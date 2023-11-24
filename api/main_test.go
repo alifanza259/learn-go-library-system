@@ -13,7 +13,7 @@ import (
 
 func newTestServer(t *testing.T, library db.Library) *Server {
 	config := util.Config{AccessTokenDuration: time.Minute}
-	server, err := NewServer(library, config)
+	server, err := NewServer(library, config, nil)
 	require.NoError(t, err)
 
 	return server

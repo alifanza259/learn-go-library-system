@@ -19,6 +19,10 @@ type Config struct {
 	AwsRegion           string        `mapstructure:"AWS_REGION"`
 	AwsAccessKeyId      string        `mapstructure:"AWS_ACCESS_KEY_ID"`
 	AwsSecretAccessKey  string        `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	RedisAddress        string        `mapstructure:"REDIS_ADDRESS"`
+	EmailSenderName     string        `mapstructure:"EMAIL_SENDER_NAME"`
+	EmailSenderAddress  string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
+	EmailSenderPassword string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

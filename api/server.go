@@ -5,22 +5,24 @@ import (
 	"github.com/alifanza259/learn-go-library-system/external"
 	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
+	"github.com/alifanza259/learn-go-library-system/worker"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	db         db.Library
-	config     util.Config
-	router     *gin.Engine
-	tokenMaker token.Maker
-	external   external.External
+	db              db.Library
+	config          util.Config
+	router          *gin.Engine
+	tokenMaker      token.Maker
+	external        external.External
+	taskDistributor worker.TaskDistributor
 }
 
-func NewServer(db db.Library, config util.Config) (*Server, error) {
+func NewServer(db db.Library, config util.Config, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker := token.NewJWTMaker(config.SecretKey, config.SecretKeyAdmin)
 	external := external.NewAwsExternal(config.AwsSecretAccessKey, config.AwsAccessKeyId, config.AwsRegion)
 
-	server := &Server{db: db, config: config, tokenMaker: tokenMaker, external: external}
+	server := &Server{db: db, config: config, tokenMaker: tokenMaker, external: external, taskDistributor: taskDistributor}
 
 	server.setupRouter()
 
