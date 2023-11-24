@@ -81,6 +81,21 @@ func (mr *MockLibraryMockRecorder) CreateBorrow(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBorrow", reflect.TypeOf((*MockLibrary)(nil).CreateBorrow), arg0, arg1)
 }
 
+// CreateEmailVerification mocks base method.
+func (m *MockLibrary) CreateEmailVerification(arg0 context.Context, arg1 db.CreateEmailVerificationParams) (db.EmailVerification, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateEmailVerification", arg0, arg1)
+	ret0, _ := ret[0].(db.EmailVerification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateEmailVerification indicates an expected call of CreateEmailVerification.
+func (mr *MockLibraryMockRecorder) CreateEmailVerification(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEmailVerification", reflect.TypeOf((*MockLibrary)(nil).CreateEmailVerification), arg0, arg1)
+}
+
 // CreateMember mocks base method.
 func (m *MockLibrary) CreateMember(arg0 context.Context, arg1 db.CreateMemberParams) (db.Member, error) {
 	m.ctrl.T.Helper()

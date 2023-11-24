@@ -39,7 +39,7 @@ func (server *Server) setupRouter() {
 
 	v1Routes.POST("/members", server.createMember)
 	v1Routes.POST("/members/login", server.loginMember)
-
+	// TODO: add verify email endpoint
 	authRoutes := r.Group("/v1").Use(authMiddleware(server.tokenMaker))
 	authRoutes.GET("/member/:id", server.getMember)
 	authRoutes.POST("/books/borrow", server.borrowBooks)

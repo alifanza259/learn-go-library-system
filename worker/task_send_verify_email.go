@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
+	"strings"
 
+	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/google/uuid"
 	"github.com/hibiken/asynq"
 )
@@ -54,13 +57,22 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	// TODO: store secret code for email verification in database
-	subject := "Complete Your Registration"
+	secretCode := generateSecretCode()
+	arg := db.CreateEmailVerificationParams{
+		Token:    secretCode,
+		MemberID: member.ID,
+	}
+	_, err = processor.library.CreateEmailVerification(ctx, arg)
+	if err != nil {
+		return fmt.Errorf("failed to create verify email: %w", err)
+	}
 
+	subject := "Complete Your Registration"
+	verifyUrl := fmt.Sprintf("http://localhost:8080/v1/member/verify?token=%s", secretCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
 	Thank you for registering with us!<br/>
 	Please <a href="%s">click here</a> to verify your email address.<br/>
-	`, member.FirstName, "http://localhost")
+	`, member.FirstName, verifyUrl)
 	to := []string{member.Email}
 
 	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
@@ -71,4 +83,17 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	fmt.Println("processed task")
 	return nil
 
+}
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+func generateSecretCode() string {
+	var sb strings.Builder
+	k := len(alphabet)
+	for i := 0; i < 32; i++ {
+		c := alphabet[rand.Intn(k)]
+		sb.WriteByte(c)
+	}
+
+	return sb.String()
 }

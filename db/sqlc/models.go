@@ -208,6 +208,15 @@ type BorrowDetail struct {
 	DeletedAt  pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type EmailVerification struct {
+	ID        int32     `json:"id"`
+	MemberID  uuid.UUID `json:"member_id"`
+	Token     string    `json:"token"`
+	IsUsed    bool      `json:"is_used"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Member struct {
 	ID                uuid.UUID          `json:"id"`
 	Email             string             `json:"email"`
@@ -221,6 +230,7 @@ type Member struct {
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
 	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+	EmailVerifiedAt   pgtype.Timestamptz `json:"email_verified_at"`
 }
 
 type Transaction struct {

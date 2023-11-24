@@ -24,7 +24,7 @@ INSERT INTO members (
 ) VALUES (
   $1, $2, $3, $4, $5, $6
 )
-RETURNING id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at
+RETURNING id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at, email_verified_at
 `
 
 type CreateMemberParams struct {
@@ -59,12 +59,13 @@ func (q *Queries) CreateMember(ctx context.Context, arg CreateMemberParams) (Mem
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
 
 const getMember = `-- name: GetMember :one
-SELECT id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at FROM members
+SELECT id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at, email_verified_at FROM members
 WHERE id = $1 LIMIT 1
 `
 
@@ -84,12 +85,13 @@ func (q *Queries) GetMember(ctx context.Context, id uuid.UUID) (Member, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
 
 const getMemberByEmail = `-- name: GetMemberByEmail :one
-SELECT id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at FROM members
+SELECT id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at, email_verified_at FROM members
 WHERE email = $1 LIMIT 1
 `
 
@@ -109,6 +111,7 @@ func (q *Queries) GetMemberByEmail(ctx context.Context, email string) (Member, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }

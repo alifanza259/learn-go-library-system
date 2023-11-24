@@ -13,6 +13,7 @@ import (
 type Querier interface {
 	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
 	CreateBorrow(ctx context.Context, arg CreateBorrowParams) (BorrowDetail, error)
+	CreateEmailVerification(ctx context.Context, arg CreateEmailVerificationParams) (EmailVerification, error)
 	CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	DeleteBook(ctx context.Context, id int32) error
