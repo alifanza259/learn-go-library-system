@@ -32,3 +32,9 @@ RETURNING *;
 -- name: GetMemberByEmail :one
 SELECT * FROM members
 WHERE email = $1 LIMIT 1;
+
+-- name: UpdateMember :one
+UPDATE members SET 
+  email_verified_at=coalesce(sqlc.narg('email_verified_at'), email_verified_at)
+WHERE id=sqlc.arg(id)
+RETURNING *;

@@ -172,3 +172,36 @@ func (q *Queries) ListMembers(ctx context.Context) ([]ListMembersRow, error) {
 	}
 	return items, nil
 }
+
+const updateMember = `-- name: UpdateMember :one
+UPDATE members SET 
+  email_verified_at=coalesce($1, email_verified_at)
+WHERE id=$2
+RETURNING id, email, first_name, last_name, dob, gender, password, password_changed_at, last_accessed_at, created_at, updated_at, deleted_at, email_verified_at
+`
+
+type UpdateMemberParams struct {
+	EmailVerifiedAt pgtype.Timestamptz `json:"email_verified_at"`
+	ID              uuid.UUID          `json:"id"`
+}
+
+func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Member, error) {
+	row := q.db.QueryRow(ctx, updateMember, arg.EmailVerifiedAt, arg.ID)
+	var i Member
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FirstName,
+		&i.LastName,
+		&i.Dob,
+		&i.Gender,
+		&i.Password,
+		&i.PasswordChangedAt,
+		&i.LastAccessedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.EmailVerifiedAt,
+	)
+	return i, err
+}

@@ -21,6 +21,7 @@ type Querier interface {
 	GetAdminByEmail(ctx context.Context, email string) (Admin, error)
 	GetBook(ctx context.Context, id int32) (Book, error)
 	GetBorrow(ctx context.Context, id uuid.UUID) (BorrowDetail, error)
+	GetEmailVerification(ctx context.Context, token string) (EmailVerification, error)
 	GetMember(ctx context.Context, id uuid.UUID) (Member, error)
 	GetMemberByEmail(ctx context.Context, email string) (Member, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error)
@@ -29,6 +30,8 @@ type Querier interface {
 	ListBooks(ctx context.Context) ([]Book, error)
 	ListMembers(ctx context.Context) ([]ListMembersRow, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
+	UpdateEmailVerification(ctx context.Context, arg UpdateEmailVerificationParams) error
+	UpdateMember(ctx context.Context, arg UpdateMemberParams) (Member, error)
 	UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error)
 }
 

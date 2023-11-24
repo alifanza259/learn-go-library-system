@@ -167,3 +167,42 @@ func (server *Server) loginMember(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resp)
 }
+
+type VerifyMemberRequest struct {
+	Token string `form:"token" binding:"required"`
+}
+
+func (server *Server) verifyMember(c *gin.Context) {
+	var req VerifyMemberRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	emailVerif, err := server.db.GetEmailVerification(c, req.Token)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			c.JSON(http.StatusBadRequest, errorResponse(errors.New("invalid token")))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if !emailVerif.IsUsed {
+		err := server.db.VerifyEmailTx(c, db.VerifyEmailTxParams{
+			EmailVerif: emailVerif,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "email verified"})
+		return
+	}
+
+	c.JSON(http.StatusBadRequest, errors.New("token already used"))
+
+}

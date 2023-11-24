@@ -215,6 +215,21 @@ func (mr *MockLibraryMockRecorder) GetBorrow(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBorrow", reflect.TypeOf((*MockLibrary)(nil).GetBorrow), arg0, arg1)
 }
 
+// GetEmailVerification mocks base method.
+func (m *MockLibrary) GetEmailVerification(arg0 context.Context, arg1 string) (db.EmailVerification, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEmailVerification", arg0, arg1)
+	ret0, _ := ret[0].(db.EmailVerification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEmailVerification indicates an expected call of GetEmailVerification.
+func (mr *MockLibraryMockRecorder) GetEmailVerification(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEmailVerification", reflect.TypeOf((*MockLibrary)(nil).GetEmailVerification), arg0, arg1)
+}
+
 // GetMember mocks base method.
 func (m *MockLibrary) GetMember(arg0 context.Context, arg1 uuid.UUID) (db.Member, error) {
 	m.ctrl.T.Helper()
@@ -335,6 +350,35 @@ func (mr *MockLibraryMockRecorder) UpdateBook(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBook", reflect.TypeOf((*MockLibrary)(nil).UpdateBook), arg0, arg1)
 }
 
+// UpdateEmailVerification mocks base method.
+func (m *MockLibrary) UpdateEmailVerification(arg0 context.Context, arg1 db.UpdateEmailVerificationParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateEmailVerification", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateEmailVerification indicates an expected call of UpdateEmailVerification.
+func (mr *MockLibraryMockRecorder) UpdateEmailVerification(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmailVerification", reflect.TypeOf((*MockLibrary)(nil).UpdateEmailVerification), arg0, arg1)
+}
+
+// UpdateMember mocks base method.
+func (m *MockLibrary) UpdateMember(arg0 context.Context, arg1 db.UpdateMemberParams) (db.Member, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMember", arg0, arg1)
+	ret0, _ := ret[0].(db.Member)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateMember indicates an expected call of UpdateMember.
+func (mr *MockLibraryMockRecorder) UpdateMember(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockLibrary)(nil).UpdateMember), arg0, arg1)
+}
+
 // UpdateTransaction mocks base method.
 func (m *MockLibrary) UpdateTransaction(arg0 context.Context, arg1 db.UpdateTransactionParams) (db.Transaction, error) {
 	m.ctrl.T.Helper()
@@ -348,4 +392,18 @@ func (m *MockLibrary) UpdateTransaction(arg0 context.Context, arg1 db.UpdateTran
 func (mr *MockLibraryMockRecorder) UpdateTransaction(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTransaction", reflect.TypeOf((*MockLibrary)(nil).UpdateTransaction), arg0, arg1)
+}
+
+// VerifyEmailTx mocks base method.
+func (m *MockLibrary) VerifyEmailTx(arg0 context.Context, arg1 db.VerifyEmailTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VerifyEmailTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// VerifyEmailTx indicates an expected call of VerifyEmailTx.
+func (mr *MockLibraryMockRecorder) VerifyEmailTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyEmailTx", reflect.TypeOf((*MockLibrary)(nil).VerifyEmailTx), arg0, arg1)
 }

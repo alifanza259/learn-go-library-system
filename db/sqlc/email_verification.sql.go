@@ -39,3 +39,38 @@ func (q *Queries) CreateEmailVerification(ctx context.Context, arg CreateEmailVe
 	)
 	return i, err
 }
+
+const getEmailVerification = `-- name: GetEmailVerification :one
+SELECT id, member_id, token, is_used, created_at, updated_at FROM email_verifications 
+WHERE token = $1 LIMIT 1
+`
+
+func (q *Queries) GetEmailVerification(ctx context.Context, token string) (EmailVerification, error) {
+	row := q.db.QueryRow(ctx, getEmailVerification, token)
+	var i EmailVerification
+	err := row.Scan(
+		&i.ID,
+		&i.MemberID,
+		&i.Token,
+		&i.IsUsed,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateEmailVerification = `-- name: UpdateEmailVerification :exec
+UPDATE email_verifications SET
+  is_used = $2
+WHERE token = $1
+`
+
+type UpdateEmailVerificationParams struct {
+	Token  string `json:"token"`
+	IsUsed bool   `json:"is_used"`
+}
+
+func (q *Queries) UpdateEmailVerification(ctx context.Context, arg UpdateEmailVerificationParams) error {
+	_, err := q.db.Exec(ctx, updateEmailVerification, arg.Token, arg.IsUsed)
+	return err
+}
