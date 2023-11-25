@@ -7,6 +7,7 @@ import (
 
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/alifanza259/learn-go-library-system/token"
+	"github.com/alifanza259/learn-go-library-system/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
@@ -221,7 +222,7 @@ func (server *Server) processBorrowReq(c *gin.Context) {
 	}
 
 	// Get Borrow/Return Request
-	_, err := server.db.GetTransaction(c, req.ID)
+	transaction, err := server.db.GetTransactionAssociatedDetail(c, req.ID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			c.JSON(http.StatusNotFound, errorResponse(err))
@@ -234,7 +235,7 @@ func (server *Server) processBorrowReq(c *gin.Context) {
 
 	// Update request status
 	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
-	updatedTrx, err := server.db.UpdateTransaction(c, db.UpdateTransactionParams{
+	arg := db.UpdateTransactionParams{
 		AdminID: pgtype.UUID{
 			Valid: true,
 			Bytes: uuid.MustParse(accessTokenPayload.ID),
@@ -245,13 +246,25 @@ func (server *Server) processBorrowReq(c *gin.Context) {
 			Valid:  req.Note != "",
 		},
 		ID: req.ID,
+	}
+	updatedTrx, err := server.db.ProcessBorrowTx(c, db.ProcessBorrowTxParams{
+		UpdateTransactionParams: arg,
+		Transaction:             transaction,
+		AfterUpdate: func(transaction db.GetTransactionAssociatedDetailRow, status db.Status, note string) error {
+			return server.taskDistributor.DistributeTaskSendBorrowProcessedEmail(c, &worker.PayloadSendBorrowProcessedEmail{
+				TransactionID: transaction.TrxID.String(),
+				MemberEmail:   transaction.Email,
+				MemberName:    transaction.FirstName,
+				BookTitle:     transaction.BTitle,
+				Status:        status,
+				Note:          note,
+			})
+		},
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	// TODO: Send email approved/declined
 
 	c.JSON(http.StatusOK, updatedTrx)
 }

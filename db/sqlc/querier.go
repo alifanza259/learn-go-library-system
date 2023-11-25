@@ -26,6 +26,7 @@ type Querier interface {
 	GetMemberByEmail(ctx context.Context, email string) (Member, error)
 	GetTransaction(ctx context.Context, id uuid.UUID) (Transaction, error)
 	GetTransactionAndBorrowDetail(ctx context.Context, id uuid.UUID) (GetTransactionAndBorrowDetailRow, error)
+	GetTransactionAssociatedDetail(ctx context.Context, id uuid.UUID) (GetTransactionAssociatedDetailRow, error)
 	ListAdmin(ctx context.Context) ([]ListAdminRow, error)
 	ListBooks(ctx context.Context) ([]Book, error)
 	ListMembers(ctx context.Context) ([]ListMembersRow, error)

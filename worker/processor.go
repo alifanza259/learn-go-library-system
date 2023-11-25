@@ -17,6 +17,7 @@ const (
 type TaskProcessor interface {
 	Start() error
 	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
+	ProcessTaskSendBorrowProcessedEmail(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {
@@ -26,7 +27,6 @@ type RedisTaskProcessor struct {
 }
 
 func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, library db.Library, mailer mail.EmailSender) TaskProcessor {
-
 	server := asynq.NewServer(
 		redisOpt,
 		asynq.Config{
@@ -50,7 +50,8 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, library db.Library, ma
 func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux()
 
-	mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	// mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	mux.HandleFunc(TaskSendBorrowProcessedEmail, processor.ProcessTaskSendBorrowProcessedEmail)
 
 	return processor.server.Start(mux)
 }

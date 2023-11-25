@@ -96,6 +96,33 @@ func (q *Queries) GetTransactionAndBorrowDetail(ctx context.Context, id uuid.UUI
 	return i, err
 }
 
+const getTransactionAssociatedDetail = `-- name: GetTransactionAssociatedDetail :one
+SELECT t.id trx_id, b.title b_title, m.email, m.first_name FROM transactions t
+JOIN borrow_details bd ON t.borrow_id = bd.id
+JOIN books b ON bd.book_id = b.id
+JOIN members m ON t.member_id = m.id
+WHERE t.id = $1 LIMIT 1
+`
+
+type GetTransactionAssociatedDetailRow struct {
+	TrxID     uuid.UUID `json:"trx_id"`
+	BTitle    string    `json:"b_title"`
+	Email     string    `json:"email"`
+	FirstName string    `json:"first_name"`
+}
+
+func (q *Queries) GetTransactionAssociatedDetail(ctx context.Context, id uuid.UUID) (GetTransactionAssociatedDetailRow, error) {
+	row := q.db.QueryRow(ctx, getTransactionAssociatedDetail, id)
+	var i GetTransactionAssociatedDetailRow
+	err := row.Scan(
+		&i.TrxID,
+		&i.BTitle,
+		&i.Email,
+		&i.FirstName,
+	)
+	return i, err
+}
+
 const updateTransaction = `-- name: UpdateTransaction :one
 UPDATE transactions 
 SET 

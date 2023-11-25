@@ -290,6 +290,21 @@ func (mr *MockLibraryMockRecorder) GetTransactionAndBorrowDetail(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionAndBorrowDetail", reflect.TypeOf((*MockLibrary)(nil).GetTransactionAndBorrowDetail), arg0, arg1)
 }
 
+// GetTransactionAssociatedDetail mocks base method.
+func (m *MockLibrary) GetTransactionAssociatedDetail(arg0 context.Context, arg1 uuid.UUID) (db.GetTransactionAssociatedDetailRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionAssociatedDetail", arg0, arg1)
+	ret0, _ := ret[0].(db.GetTransactionAssociatedDetailRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionAssociatedDetail indicates an expected call of GetTransactionAssociatedDetail.
+func (mr *MockLibraryMockRecorder) GetTransactionAssociatedDetail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionAssociatedDetail", reflect.TypeOf((*MockLibrary)(nil).GetTransactionAssociatedDetail), arg0, arg1)
+}
+
 // ListAdmin mocks base method.
 func (m *MockLibrary) ListAdmin(arg0 context.Context) ([]db.ListAdminRow, error) {
 	m.ctrl.T.Helper()
@@ -333,6 +348,21 @@ func (m *MockLibrary) ListMembers(arg0 context.Context) ([]db.ListMembersRow, er
 func (mr *MockLibraryMockRecorder) ListMembers(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMembers", reflect.TypeOf((*MockLibrary)(nil).ListMembers), arg0)
+}
+
+// ProcessBorrowTx mocks base method.
+func (m *MockLibrary) ProcessBorrowTx(arg0 context.Context, arg1 db.ProcessBorrowTxParams) (db.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProcessBorrowTx", arg0, arg1)
+	ret0, _ := ret[0].(db.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProcessBorrowTx indicates an expected call of ProcessBorrowTx.
+func (mr *MockLibraryMockRecorder) ProcessBorrowTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessBorrowTx", reflect.TypeOf((*MockLibrary)(nil).ProcessBorrowTx), arg0, arg1)
 }
 
 // UpdateBook mocks base method.

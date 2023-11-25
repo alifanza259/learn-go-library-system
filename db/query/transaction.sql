@@ -7,6 +7,13 @@ SELECT t.id trx_id, t.member_id trx_member_id, bd.id bd_id FROM transactions t
 JOIN borrow_details bd ON t.borrow_id = bd.id
 WHERE t.id = $1 LIMIT 1;
 
+-- name: GetTransactionAssociatedDetail :one
+SELECT t.id trx_id, b.title b_title, m.email, m.first_name FROM transactions t
+JOIN borrow_details bd ON t.borrow_id = bd.id
+JOIN books b ON bd.book_id = b.id
+JOIN members m ON t.member_id = m.id
+WHERE t.id = $1 LIMIT 1;
+
 -- name: CreateTransaction :one
 INSERT INTO transactions (
   member_id,

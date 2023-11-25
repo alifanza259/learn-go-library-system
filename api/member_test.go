@@ -172,6 +172,9 @@ func TestCreateMember(t *testing.T) {
 		Gender:    "male",
 		Password:  "Password",
 	}
+	memberTx := db.CreateMemberTxResult{
+		Member: member,
+	}
 
 	testCases := []struct {
 		name          string
@@ -189,7 +192,7 @@ func TestCreateMember(t *testing.T) {
 				"dob":        1695293619,
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
-				libraryMock.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Times(1).Return(member, nil)
+				libraryMock.EXPECT().CreateMemberTx(gomock.Any(), gomock.Any()).Times(1).Return(memberTx, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -205,7 +208,7 @@ func TestCreateMember(t *testing.T) {
 				"dob":        1695293619,
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
-				libraryMock.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Times(0)
+				libraryMock.EXPECT().CreateMemberTx(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -221,7 +224,7 @@ func TestCreateMember(t *testing.T) {
 				"dob":        1695293619,
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
-				libraryMock.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Times(1).Return(db.Member{}, &pgconn.PgError{})
+				libraryMock.EXPECT().CreateMemberTx(gomock.Any(), gomock.Any()).Times(1).Return(db.CreateMemberTxResult{}, &pgconn.PgError{})
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
