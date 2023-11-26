@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// TODO: Implement token with paseto
 type Maker interface {
 	// duration is passed here as parameter for unit test purposes (test unhappy case)
 	CreateToken(email string, id string, duration time.Duration, purpose string) (string, int, error)

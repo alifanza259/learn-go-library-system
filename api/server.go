@@ -43,7 +43,9 @@ func (server *Server) setupRouter() {
 
 	authRoutes := r.Group("/v1").Use(authMiddleware(server.tokenMaker))
 	authRoutes.GET("/member/:id", server.getMember)
+	// TODO: implement stock in borrow process
 	authRoutes.POST("/books/borrow", server.borrowBooks)
+	// TODO: check/complete return books
 	authRoutes.POST("/books/return", server.returnBooks)
 
 	adminRoutes := r.Group("/admin")
@@ -52,10 +54,12 @@ func (server *Server) setupRouter() {
 	adminAuthRoutes := r.Group("/admin").Use(adminAuthMiddleware(server.tokenMaker))
 	adminAuthRoutes.GET("/admin/:id", server.getAdmin)
 	adminAuthRoutes.GET("/admin", server.listAdmin)
+	// TODO: complete admin permission feature
 	adminAuthRoutes.GET("/members", server.listMembers)
 	adminAuthRoutes.POST("/books", server.createBook)
 	adminAuthRoutes.PATCH("/book/:id", server.updateBook)
 	adminAuthRoutes.DELETE("/book/:id", server.deleteBook)
+	// TODO: check/complete return books
 	adminAuthRoutes.PATCH("/books/process_request", server.processBorrowReq)
 
 	server.router = r

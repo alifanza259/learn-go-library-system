@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTMaker struct {
@@ -16,7 +16,7 @@ type JWTMaker struct {
 type Payload struct {
 	Email string `json:"email"`
 	ID    string `json:"id"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func NewJWTMaker(secret string, secretAdmin string) Maker {
@@ -26,20 +26,19 @@ func NewJWTMaker(secret string, secretAdmin string) Maker {
 	}
 }
 
+// TODO: change purpose to enum/const
 func (maker *JWTMaker) CreateToken(email string, id string, duration time.Duration, purpose string) (string, int, error) {
-	expiresAt := time.Now().Add(duration).Unix()
+	expiresAt := time.Now().Add(duration)
 	claims := Payload{
 		email,
 		id,
-		jwt.StandardClaims{
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: expiresAt,
+		jwt.RegisteredClaims{
 			Issuer:    "login",
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
-
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	var secret string
 	if purpose == "admin" {
 		secret = maker.secretAdmin
@@ -47,12 +46,13 @@ func (maker *JWTMaker) CreateToken(email string, id string, duration time.Durati
 		secret = maker.secret
 	}
 
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := t.SignedString([]byte(secret))
 	if err != nil {
 		return "", 0, fmt.Errorf("failed to create token: %w", err)
 	}
 
-	return tokenString, int(expiresAt), nil
+	return tokenString, int(expiresAt.Unix()), nil
+
 }
 
 func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload, error) {
@@ -73,10 +73,6 @@ func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload
 	})
 
 	if err != nil {
-		verr, ok := err.(*jwt.ValidationError)
-		if ok && errors.Is(verr.Inner, errors.New("token has expired")) {
-			return nil, errors.New("token has expired")
-		}
 		return nil, errors.New("token is invalid")
 	}
 

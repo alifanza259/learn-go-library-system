@@ -4,8 +4,8 @@ go 1.21.0
 
 require (
 	github.com/aws/aws-sdk-go v1.45.15
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.1
 	github.com/jackc/pgx v3.6.2+incompatible
