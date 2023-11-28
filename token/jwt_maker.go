@@ -27,6 +27,10 @@ type CustomClaimsGolangJwt struct {
 	jwt.RegisteredClaims
 }
 
+const (
+	purposeAdmin = "admin"
+)
+
 func NewJWTMaker(secret string, secretAdmin string) Maker {
 	return &JWTMaker{
 		secret:      secret,
@@ -34,7 +38,6 @@ func NewJWTMaker(secret string, secretAdmin string) Maker {
 	}
 }
 
-// TODO: change purpose to enum/const
 func (maker *JWTMaker) CreateToken(email string, id string, duration time.Duration, purpose string) (string, int, error) {
 	expiresAt := time.Now().Add(duration)
 	claims := &CustomClaimsGolangJwt{
@@ -48,7 +51,7 @@ func (maker *JWTMaker) CreateToken(email string, id string, duration time.Durati
 	}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	var secret string
-	if purpose == "admin" {
+	if purpose == purposeAdmin {
 		secret = maker.secretAdmin
 	} else {
 		secret = maker.secret
@@ -65,7 +68,7 @@ func (maker *JWTMaker) CreateToken(email string, id string, duration time.Durati
 
 func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload, error) {
 	var secret string
-	if purpose == "admin" {
+	if purpose == purposeAdmin {
 		secret = maker.secretAdmin
 	} else {
 		secret = maker.secret

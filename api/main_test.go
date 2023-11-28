@@ -12,7 +12,11 @@ import (
 )
 
 func newTestServer(t *testing.T, library db.Library) *Server {
-	config := util.Config{AccessTokenDuration: time.Minute}
+	config := util.Config{
+		AccessTokenDuration: time.Minute,
+		SymmetricKey:        "12345678901234567890123456789012",
+		SymmetricKeyAdmin:   "12345678901234567890123456789012",
+	}
 	server, err := NewServer(library, config, nil)
 	require.NoError(t, err)
 
