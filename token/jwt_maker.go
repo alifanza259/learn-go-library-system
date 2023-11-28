@@ -14,6 +14,14 @@ type JWTMaker struct {
 }
 
 type Payload struct {
+	Email     string    `json:"email"`
+	ID        string    `json:"id"`
+	Issuer    string    `json:"iss"`
+	ExpiresAt time.Time `json:"exp"`
+	IssuedAt  time.Time `json:"iat"`
+}
+
+type CustomClaimsGolangJwt struct {
 	Email string `json:"email"`
 	ID    string `json:"id"`
 	jwt.RegisteredClaims
@@ -29,7 +37,7 @@ func NewJWTMaker(secret string, secretAdmin string) Maker {
 // TODO: change purpose to enum/const
 func (maker *JWTMaker) CreateToken(email string, id string, duration time.Duration, purpose string) (string, int, error) {
 	expiresAt := time.Now().Add(duration)
-	claims := Payload{
+	claims := &CustomClaimsGolangJwt{
 		email,
 		id,
 		jwt.RegisteredClaims{
@@ -63,7 +71,7 @@ func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload
 		secret = maker.secret
 	}
 
-	token, err := jwt.ParseWithClaims(tokenString, &Payload{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaimsGolangJwt{}, func(t *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("token is invalid")
@@ -76,9 +84,17 @@ func (maker *JWTMaker) VerifyToken(tokenString string, purpose string) (*Payload
 		return nil, errors.New("token is invalid")
 	}
 
-	payload, ok := token.Claims.(*Payload)
+	claims, ok := token.Claims.(*CustomClaimsGolangJwt)
 	if !ok {
 		return nil, errors.New("token is invalid")
+	}
+
+	payload := &Payload{
+		Email:     claims.Email,
+		ID:        claims.ID,
+		Issuer:    claims.Issuer,
+		ExpiresAt: claims.ExpiresAt.Time,
+		IssuedAt:  claims.IssuedAt.Time,
 	}
 	return payload, nil
 }

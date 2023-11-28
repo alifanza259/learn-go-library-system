@@ -42,7 +42,6 @@ func (distributor *RedisTaskDistributor) DistributeTaskSendBorrowProcessedEmail(
 }
 
 func (processor *RedisTaskProcessor) ProcessTaskSendBorrowProcessedEmail(ctx context.Context, task *asynq.Task) error {
-	fmt.Println("masuk")
 	var payload PayloadSendBorrowProcessedEmail
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return err

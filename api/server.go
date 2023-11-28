@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/alifanza259/learn-go-library-system/external"
 	"github.com/alifanza259/learn-go-library-system/token"
@@ -19,7 +21,10 @@ type Server struct {
 }
 
 func NewServer(db db.Library, config util.Config, taskDistributor worker.TaskDistributor) (*Server, error) {
-	tokenMaker := token.NewJWTMaker(config.SecretKey, config.SecretKeyAdmin)
+	tokenMaker, err := token.NewPasetoMaker(config.SymmetricKey, config.SymmetricKeyAdmin)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
 	external := external.NewAwsExternal(config.AwsSecretAccessKey, config.AwsAccessKeyId, config.AwsRegion)
 
 	server := &Server{db: db, config: config, tokenMaker: tokenMaker, external: external, taskDistributor: taskDistributor}
