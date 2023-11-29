@@ -17,6 +17,11 @@ type TaskDistributor interface {
 		payload *PayloadSendBorrowProcessedEmail,
 		opts ...asynq.Option,
 	) error
+	DistributeTaskSendReturnProcessedEmail(
+		ctx context.Context,
+		payload *PayloadSendReturnProcessedEmail,
+		opts ...asynq.Option,
+	) error
 }
 
 type RedisTaskDistributor struct {

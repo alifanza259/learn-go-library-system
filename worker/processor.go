@@ -18,6 +18,7 @@ type TaskProcessor interface {
 	Start() error
 	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
 	ProcessTaskSendBorrowProcessedEmail(ctx context.Context, task *asynq.Task) error
+	ProcessTaskSendReturnProcessedEmail(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {

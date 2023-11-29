@@ -365,6 +365,21 @@ func (mr *MockLibraryMockRecorder) ProcessBorrowTx(arg0, arg1 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessBorrowTx", reflect.TypeOf((*MockLibrary)(nil).ProcessBorrowTx), arg0, arg1)
 }
 
+// ProcessReturnTx mocks base method.
+func (m *MockLibrary) ProcessReturnTx(arg0 context.Context, arg1 db.ProcessReturnTxParams) (db.Transaction, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProcessReturnTx", arg0, arg1)
+	ret0, _ := ret[0].(db.Transaction)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProcessReturnTx indicates an expected call of ProcessReturnTx.
+func (mr *MockLibraryMockRecorder) ProcessReturnTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessReturnTx", reflect.TypeOf((*MockLibrary)(nil).ProcessReturnTx), arg0, arg1)
+}
+
 // UpdateBook mocks base method.
 func (m *MockLibrary) UpdateBook(arg0 context.Context, arg1 db.UpdateBookParams) (db.Book, error) {
 	m.ctrl.T.Helper()

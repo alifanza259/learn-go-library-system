@@ -12,6 +12,7 @@ type Library interface {
 	CreateMemberTx(ctx context.Context, arg CreateMemberTxParams) (CreateMemberTxResult, error)
 	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) error
 	ProcessBorrowTx(ctx context.Context, arg ProcessBorrowTxParams) (Transaction, error)
+	ProcessReturnTx(ctx context.Context, arg ProcessReturnTxParams) (Transaction, error)
 }
 
 // Provide all functions for db queries (Queries) and transactions (db)

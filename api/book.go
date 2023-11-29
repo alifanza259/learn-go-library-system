@@ -95,6 +95,7 @@ func (server *Server) borrowBooks(c *gin.Context) {
 	transaction, err := server.db.BorrowTx(c, db.BorrowTxParams{
 		CreateBorrowParams:      borrowDetailArg,
 		CreateTransactionParams: createTransactionArg,
+		Quantity:                int(book.Quantity),
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))

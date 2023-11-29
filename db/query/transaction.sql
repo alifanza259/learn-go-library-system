@@ -8,7 +8,7 @@ JOIN borrow_details bd ON t.borrow_id = bd.id
 WHERE t.id = $1 LIMIT 1;
 
 -- name: GetTransactionAssociatedDetail :one
-SELECT t.id trx_id, b.title b_title, m.email, m.first_name FROM transactions t
+SELECT t.id trx_id, b.title b_title, m.email, m.first_name, b.id b_id, t.purpose t_purpose FROM transactions t
 JOIN borrow_details bd ON t.borrow_id = bd.id
 JOIN books b ON bd.book_id = b.id
 JOIN members m ON t.member_id = m.id

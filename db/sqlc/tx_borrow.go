@@ -12,6 +12,7 @@ import (
 type BorrowTxParams struct {
 	CreateBorrowParams
 	CreateTransactionParams
+	Quantity int
 }
 
 type BorrowTxResult struct {
@@ -65,6 +66,17 @@ func (library *SQLLibrary) BorrowTx(ctx context.Context, arg BorrowTxParams) (Bo
 			CreatedAt: transaction.CreatedAt,
 			UpdatedAt: transaction.UpdatedAt,
 		}
+		if err != nil {
+			return err
+		}
+		// Update entry in books table
+		_, err = q.UpdateBook(ctx, UpdateBookParams{
+			ID: borrowDetail.BookID,
+			Quantity: pgtype.Int4{
+				Int32: int32(arg.Quantity) - 1,
+				Valid: true,
+			},
+		})
 		return err
 	})
 

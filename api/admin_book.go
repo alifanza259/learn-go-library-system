@@ -247,24 +247,48 @@ func (server *Server) processBorrowReq(c *gin.Context) {
 		},
 		ID: req.ID,
 	}
-	updatedTrx, err := server.db.ProcessBorrowTx(c, db.ProcessBorrowTxParams{
-		UpdateTransactionParams: arg,
-		Transaction:             transaction,
-		AfterUpdate: func(transaction db.GetTransactionAssociatedDetailRow, status db.Status, note string) error {
-			return server.taskDistributor.DistributeTaskSendBorrowProcessedEmail(c, &worker.PayloadSendBorrowProcessedEmail{
-				TransactionID: transaction.TrxID.String(),
-				MemberEmail:   transaction.Email,
-				MemberName:    transaction.FirstName,
-				BookTitle:     transaction.BTitle,
-				Status:        status,
-				Note:          note,
-			})
-		},
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
 
-	c.JSON(http.StatusOK, updatedTrx)
+	if transaction.TPurpose == db.PurposeBorrow {
+		updatedTrx, err := server.db.ProcessBorrowTx(c, db.ProcessBorrowTxParams{
+			UpdateTransactionParams: arg,
+			Transaction:             transaction,
+			AfterUpdate: func(transaction db.GetTransactionAssociatedDetailRow, status db.Status, note string) error {
+				return server.taskDistributor.DistributeTaskSendBorrowProcessedEmail(c, &worker.PayloadSendBorrowProcessedEmail{
+					TransactionID: transaction.TrxID.String(),
+					MemberEmail:   transaction.Email,
+					MemberName:    transaction.FirstName,
+					BookTitle:     transaction.BTitle,
+					Status:        status,
+					Note:          note,
+				})
+			},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, updatedTrx)
+	} else {
+		updatedTrx, err := server.db.ProcessReturnTx(c, db.ProcessReturnTxParams{
+			UpdateTransactionParams: arg,
+			Transaction:             transaction,
+			AfterUpdate: func(transaction db.GetTransactionAssociatedDetailRow, status db.Status, note string) error {
+				return server.taskDistributor.DistributeTaskSendReturnProcessedEmail(c, &worker.PayloadSendReturnProcessedEmail{
+					TransactionID: transaction.TrxID.String(),
+					MemberEmail:   transaction.Email,
+					MemberName:    transaction.FirstName,
+					BookTitle:     transaction.BTitle,
+					Status:        status,
+					Note:          note,
+				})
+			},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, updatedTrx)
+	}
 }

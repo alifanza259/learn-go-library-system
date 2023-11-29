@@ -47,10 +47,11 @@ func (server *Server) setupRouter() {
 	v1Routes.POST("/members/login", server.loginMember)
 
 	authRoutes := r.Group("/v1").Use(authMiddleware(server.tokenMaker))
+	// TODO: add get borrow history
 	authRoutes.GET("/member/:id", server.getMember)
-	// TODO: implement stock in borrow process
+	// TODO: implement lock in borrow and return process
+	// TODO: check n+1 problem in borrow and return process
 	authRoutes.POST("/books/borrow", server.borrowBooks)
-	// TODO: check/complete return books
 	authRoutes.POST("/books/return", server.returnBooks)
 
 	adminRoutes := r.Group("/admin")
@@ -64,7 +65,6 @@ func (server *Server) setupRouter() {
 	adminAuthRoutes.POST("/books", server.createBook)
 	adminAuthRoutes.PATCH("/book/:id", server.updateBook)
 	adminAuthRoutes.DELETE("/book/:id", server.deleteBook)
-	// TODO: check/complete return books
 	adminAuthRoutes.PATCH("/books/process_request", server.processBorrowReq)
 
 	server.router = r
