@@ -36,6 +36,7 @@ func TestListMembers(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
+				libraryMock.EXPECT().GetAdmin(gomock.Any(), gomock.Any()).Times(1).Return(db.Admin{Permission: "super"}, nil)
 				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return(members, nil)
 			},
 			checkResponse: func(t *testing.T, recorder httptest.ResponseRecorder) {
@@ -48,6 +49,7 @@ func TestListMembers(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.Email, db.Member{ID: uuid.New(), Email: "diff@gmail.com"}.ID, time.Minute, "member")
 			},
 			buildStubs: func(libraryMock *mockdb.MockLibrary) {
+				libraryMock.EXPECT().GetAdmin(gomock.Any(), gomock.Any()).Times(1).Return(db.Admin{Permission: "super"}, nil)
 				libraryMock.EXPECT().ListMembers(gomock.Any()).Times(1).Return([]db.ListMembersRow{}, &pgconn.PgError{Code: "123"})
 			},
 			checkResponse: func(t *testing.T, recorder httptest.ResponseRecorder) {

@@ -33,3 +33,9 @@ SET
   note=$3
 WHERE id=$4
 RETURNING *;
+
+-- name: GetBorrowHistory :many
+SELECT t.ID t_id, b.title b_title, b.author b_author, b.image_url b_image_url, bd.borrowed_at bd_borrowed_at, bd.returned_at bd_returned_at FROM transactions t
+JOIN borrow_details bd ON t.borrow_id = bd.id
+JOIN books b ON bd.book_id = b.id
+WHERE t.member_id = sqlc.arg('member_id') AND t.status = coalesce(sqlc.narg('status'), status) ;

@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -52,6 +53,54 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.DeletedAt,
 	)
 	return i, err
+}
+
+const getBorrowHistory = `-- name: GetBorrowHistory :many
+SELECT t.ID t_id, b.title b_title, b.author b_author, b.image_url b_image_url, bd.borrowed_at bd_borrowed_at, bd.returned_at bd_returned_at FROM transactions t
+JOIN borrow_details bd ON t.borrow_id = bd.id
+JOIN books b ON bd.book_id = b.id
+WHERE t.member_id = $1 AND t.status = coalesce($2, status)
+`
+
+type GetBorrowHistoryParams struct {
+	MemberID uuid.UUID  `json:"member_id"`
+	Status   NullStatus `json:"status"`
+}
+
+type GetBorrowHistoryRow struct {
+	TID          uuid.UUID   `json:"t_id"`
+	BTitle       string      `json:"b_title"`
+	BAuthor      string      `json:"b_author"`
+	BImageUrl    pgtype.Text `json:"b_image_url"`
+	BdBorrowedAt time.Time   `json:"bd_borrowed_at"`
+	BdReturnedAt time.Time   `json:"bd_returned_at"`
+}
+
+func (q *Queries) GetBorrowHistory(ctx context.Context, arg GetBorrowHistoryParams) ([]GetBorrowHistoryRow, error) {
+	rows, err := q.db.Query(ctx, getBorrowHistory, arg.MemberID, arg.Status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetBorrowHistoryRow{}
+	for rows.Next() {
+		var i GetBorrowHistoryRow
+		if err := rows.Scan(
+			&i.TID,
+			&i.BTitle,
+			&i.BAuthor,
+			&i.BImageUrl,
+			&i.BdBorrowedAt,
+			&i.BdReturnedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getTransaction = `-- name: GetTransaction :one

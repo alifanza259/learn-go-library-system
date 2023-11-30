@@ -7,6 +7,7 @@ import (
 
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
 	"github.com/alifanza259/learn-go-library-system/token"
+	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/alifanza259/learn-go-library-system/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -29,6 +30,18 @@ func (server *Server) createBook(c *gin.Context) {
 	var req createBookRequest
 	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	accessPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	admin, err := server.db.GetAdmin(c, uuid.MustParse(accessPayload.ID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if authorized := util.IsAdminAuthorized(admin, adminPermissionCatalog); !authorized {
+		c.JSON(http.StatusForbidden, errorResponse(errors.New("admin is not authorized to create book entry")))
 		return
 	}
 
@@ -93,6 +106,18 @@ func (server *Server) updateBook(c *gin.Context) {
 	var reqForm UpdateBookRequestJSON
 	var reqURI UpdateBookRequestURI
 
+	accessPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	admin, err := server.db.GetAdmin(c, uuid.MustParse(accessPayload.ID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if authorized := util.IsAdminAuthorized(admin, adminPermissionCatalog); !authorized {
+		c.JSON(http.StatusForbidden, errorResponse(errors.New("admin is not authorized to update book")))
+		return
+	}
+
 	if err := c.ShouldBindWith(&reqForm, binding.FormMultipart); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -104,7 +129,7 @@ func (server *Server) updateBook(c *gin.Context) {
 	}
 
 	// Validate entry is exist
-	_, err := server.db.GetBook(c, int32(reqURI.ID))
+	_, err = server.db.GetBook(c, int32(reqURI.ID))
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			c.JSON(http.StatusNotFound, errorResponse(err))
@@ -198,8 +223,20 @@ func (server *Server) deleteBook(c *gin.Context) {
 		return
 	}
 
+	accessPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	admin, err := server.db.GetAdmin(c, uuid.MustParse(accessPayload.ID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if authorized := util.IsAdminAuthorized(admin, adminPermissionCatalog); !authorized {
+		c.JSON(http.StatusForbidden, errorResponse(errors.New("admin is not authorized to delete book entry")))
+		return
+	}
+
 	// Delete entry
-	err := server.db.DeleteBook(c, int32(req.ID))
+	err = server.db.DeleteBook(c, int32(req.ID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -218,6 +255,18 @@ func (server *Server) processBorrowReq(c *gin.Context) {
 	var req ProcessBorrowReqRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	accessPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	admin, err := server.db.GetAdmin(c, uuid.MustParse(accessPayload.ID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if authorized := util.IsAdminAuthorized(admin, adminPermissionApproval); !authorized {
+		c.JSON(http.StatusForbidden, errorResponse(errors.New("admin is not authorized to make approval")))
 		return
 	}
 

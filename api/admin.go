@@ -1,10 +1,12 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
 	db "github.com/alifanza259/learn-go-library-system/db/sqlc"
+	"github.com/alifanza259/learn-go-library-system/token"
 	"github.com/alifanza259/learn-go-library-system/util"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,6 +17,12 @@ import (
 type GetAdminRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
+
+const (
+	adminPermissionCatalog  = "catalog"
+	adminPermissionApproval = "approval"
+	adminPermissionSuper    = "super"
+)
 
 type GetAdminResponse struct {
 	ID         string      `json:"id" binding:"uuid"`
@@ -59,13 +67,25 @@ func (server *Server) getAdmin(c *gin.Context) {
 }
 
 func (server *Server) listAdmin(c *gin.Context) {
-	admin, err := server.db.ListAdmin(c)
+	accessPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	admin, err := server.db.GetAdmin(c, uuid.MustParse(accessPayload.ID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, admin)
+	if authorized := util.IsAdminAuthorized(admin, adminPermissionSuper); !authorized {
+		c.JSON(http.StatusForbidden, errorResponse(errors.New("admin is not authorized to get list of available admin")))
+		return
+	}
+
+	listAdmin, err := server.db.ListAdmin(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, listAdmin)
 }
 
 type LoginAdminRequest struct {

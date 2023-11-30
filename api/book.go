@@ -144,3 +144,29 @@ func (server *Server) returnBooks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, returnTransaction)
 }
+
+type ListBorrowRequestParams struct {
+	Status db.Status `form:"status"`
+}
+
+func (server *Server) listBorrowRequests(c *gin.Context) {
+	var req ListBorrowRequestParams
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
+	histories, err := server.db.GetBorrowHistory(c, db.GetBorrowHistoryParams{
+		MemberID: uuid.MustParse(accessTokenPayload.ID),
+		Status: db.NullStatus{
+			Status: req.Status,
+			Valid:  req.Status != "",
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, histories)
+}

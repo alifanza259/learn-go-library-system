@@ -215,6 +215,21 @@ func (mr *MockLibraryMockRecorder) GetBorrow(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBorrow", reflect.TypeOf((*MockLibrary)(nil).GetBorrow), arg0, arg1)
 }
 
+// GetBorrowHistory mocks base method.
+func (m *MockLibrary) GetBorrowHistory(arg0 context.Context, arg1 db.GetBorrowHistoryParams) ([]db.GetBorrowHistoryRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBorrowHistory", arg0, arg1)
+	ret0, _ := ret[0].([]db.GetBorrowHistoryRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBorrowHistory indicates an expected call of GetBorrowHistory.
+func (mr *MockLibraryMockRecorder) GetBorrowHistory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBorrowHistory", reflect.TypeOf((*MockLibrary)(nil).GetBorrowHistory), arg0, arg1)
+}
+
 // GetEmailVerification mocks base method.
 func (m *MockLibrary) GetEmailVerification(arg0 context.Context, arg1 string) (db.EmailVerification, error) {
 	m.ctrl.T.Helper()

@@ -21,6 +21,7 @@ type Querier interface {
 	GetAdminByEmail(ctx context.Context, email string) (Admin, error)
 	GetBook(ctx context.Context, id int32) (Book, error)
 	GetBorrow(ctx context.Context, id uuid.UUID) (BorrowDetail, error)
+	GetBorrowHistory(ctx context.Context, arg GetBorrowHistoryParams) ([]GetBorrowHistoryRow, error)
 	GetEmailVerification(ctx context.Context, token string) (EmailVerification, error)
 	GetMember(ctx context.Context, id uuid.UUID) (Member, error)
 	GetMemberByEmail(ctx context.Context, email string) (Member, error)
