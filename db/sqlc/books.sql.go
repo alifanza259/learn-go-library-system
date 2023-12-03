@@ -103,6 +103,31 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
 	return i, err
 }
 
+const getBookForUpdate = `-- name: GetBookForUpdate :one
+SELECT id, isbn, title, description, author, image_url, genre, quantity, published_at, created_at, updated_at, deleted_at FROM books
+WHERE id = $1 LIMIT 1 FOR UPDATE
+`
+
+func (q *Queries) GetBookForUpdate(ctx context.Context, id int32) (Book, error) {
+	row := q.db.QueryRow(ctx, getBookForUpdate, id)
+	var i Book
+	err := row.Scan(
+		&i.ID,
+		&i.Isbn,
+		&i.Title,
+		&i.Description,
+		&i.Author,
+		&i.ImageUrl,
+		&i.Genre,
+		&i.Quantity,
+		&i.PublishedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const listBooks = `-- name: ListBooks :many
 SELECT id, isbn, title, description, author, image_url, genre, quantity, published_at, created_at, updated_at, deleted_at
 FROM books

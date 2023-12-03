@@ -49,8 +49,6 @@ func (server *Server) setupRouter() {
 	authRoutes := r.Group("/v1").Use(authMiddleware(server.tokenMaker))
 	authRoutes.GET("/member/:id", server.getMember)
 	authRoutes.GET("/books/borrow_history", server.listBorrowRequests)
-	// TODO: implement lock in borrow and return process
-	// TODO: check n+1 problem in borrow and return process
 	authRoutes.POST("/books/borrow", server.borrowBooks)
 	authRoutes.POST("/books/return", server.returnBooks)
 

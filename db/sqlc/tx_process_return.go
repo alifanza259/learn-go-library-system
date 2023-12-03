@@ -22,7 +22,7 @@ func (library *SQLLibrary) ProcessReturnTx(ctx context.Context, arg ProcessRetur
 			return err
 		}
 		if arg.UpdateTransactionParams.Status == StatusApproved {
-			book, err := q.GetBook(ctx, arg.Transaction.BID)
+			book, err := q.GetBookForUpdate(ctx, arg.Transaction.BID)
 			if err != nil {
 				return err
 			}

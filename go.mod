@@ -3,6 +3,7 @@ module github.com/alifanza259/learn-go-library-system
 go 1.21.0
 
 require (
+	aidanwoods.dev/go-paseto v1.5.1
 	github.com/aws/aws-sdk-go v1.45.15
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.1.0
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	aidanwoods.dev/go-paseto v1.5.1 // indirect
 	aidanwoods.dev/go-result v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

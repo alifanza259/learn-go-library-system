@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 type BorrowTxParams struct {
 	CreateBorrowParams
 	CreateTransactionParams
-	Quantity int
 }
 
 type BorrowTxResult struct {
@@ -47,10 +47,20 @@ func (library *SQLLibrary) execTx(ctx context.Context, fn func(*Queries) error) 
 func (library *SQLLibrary) BorrowTx(ctx context.Context, arg BorrowTxParams) (BorrowTxResult, error) {
 	var result BorrowTxResult
 	err := library.execTx(ctx, func(q *Queries) error {
+		// Find books in books table, check quantity. Locking the row with SELECT FOR UPDATE
+		book, err := q.GetBookForUpdate(ctx, arg.CreateBorrowParams.BookID)
+		if err != nil {
+			return fmt.Errorf("failed to get book for update: %w", err)
+		}
+
+		if book.Quantity == 0 {
+			return errors.New("books are not available to borrow")
+		}
+
 		// Create entry in borrow_details table
 		borrowDetail, err := q.CreateBorrow(ctx, arg.CreateBorrowParams)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create borrow detail entry: %w", err)
 		}
 		arg.CreateTransactionParams.BorrowID = borrowDetail.ID
 		// Create entry in transactions table
@@ -67,13 +77,14 @@ func (library *SQLLibrary) BorrowTx(ctx context.Context, arg BorrowTxParams) (Bo
 			UpdatedAt: transaction.UpdatedAt,
 		}
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create transaction entry: %w", err)
+
 		}
 		// Update entry in books table
 		_, err = q.UpdateBook(ctx, UpdateBookParams{
 			ID: borrowDetail.BookID,
 			Quantity: pgtype.Int4{
-				Int32: int32(arg.Quantity) - 1,
+				Int32: int32(book.Quantity) - 1,
 				Valid: true,
 			},
 		})

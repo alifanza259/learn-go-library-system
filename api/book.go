@@ -61,24 +61,7 @@ func (server *Server) borrowBooks(c *gin.Context) {
 		return
 	}
 
-	// Find books in books table, check quantity
-	book, err := server.db.GetBook(c, req.ID)
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			c.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	if book.Quantity == 0 {
-		c.JSON(http.StatusBadRequest, errorResponse(errors.New("books are not available to borrow")))
-		return
-	}
-
-	// Create entry in borrow_details and transactions table using sql transaction
+	// Create arguments for BorrowTx function
 	accessTokenPayload := c.MustGet(authorizationPayloadKey).(*token.Payload)
 	borrowDetailArg := db.CreateBorrowParams{
 		BookID:     req.ID,
@@ -95,9 +78,18 @@ func (server *Server) borrowBooks(c *gin.Context) {
 	transaction, err := server.db.BorrowTx(c, db.BorrowTxParams{
 		CreateBorrowParams:      borrowDetailArg,
 		CreateTransactionParams: createTransactionArg,
-		Quantity:                int(book.Quantity),
 	})
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			c.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		if err == errors.New("books are not available to borrow") {
+			c.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

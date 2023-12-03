@@ -200,6 +200,21 @@ func (mr *MockLibraryMockRecorder) GetBook(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBook", reflect.TypeOf((*MockLibrary)(nil).GetBook), arg0, arg1)
 }
 
+// GetBookForUpdate mocks base method.
+func (m *MockLibrary) GetBookForUpdate(arg0 context.Context, arg1 int32) (db.Book, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBookForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(db.Book)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBookForUpdate indicates an expected call of GetBookForUpdate.
+func (mr *MockLibraryMockRecorder) GetBookForUpdate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBookForUpdate", reflect.TypeOf((*MockLibrary)(nil).GetBookForUpdate), arg0, arg1)
+}
+
 // GetBorrow mocks base method.
 func (m *MockLibrary) GetBorrow(arg0 context.Context, arg1 uuid.UUID) (db.BorrowDetail, error) {
 	m.ctrl.T.Helper()

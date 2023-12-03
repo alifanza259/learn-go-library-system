@@ -22,7 +22,7 @@ func (library *SQLLibrary) ProcessBorrowTx(ctx context.Context, arg ProcessBorro
 			return err
 		}
 		if arg.UpdateTransactionParams.Status == StatusDeclined {
-			book, err := q.GetBook(ctx, arg.Transaction.BID)
+			book, err := q.GetBookForUpdate(ctx, arg.Transaction.BID)
 			if err != nil {
 				return err
 			}

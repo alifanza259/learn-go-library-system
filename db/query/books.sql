@@ -2,6 +2,10 @@
 SELECT * FROM books
 WHERE id = $1 LIMIT 1;
 
+-- name: GetBookForUpdate :one
+SELECT * FROM books
+WHERE id = $1 LIMIT 1 FOR UPDATE;
+
 -- name: ListBooks :many
 SELECT *
 FROM books
